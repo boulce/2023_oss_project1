@@ -34,7 +34,7 @@ dependencies {
 
 group = 'com.github'
 version = '1.1'
-description = 'filemanager'
+description = 'OSS_Proj1'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 publishing {
