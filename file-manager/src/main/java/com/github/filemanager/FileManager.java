@@ -112,6 +112,8 @@ public class FileManager {
     private FileTableModel fileTableModel;
 
     private ListSelectionListener listSelectionListener;
+
+    private MouseAdapter mouseAdapter;//우클릭 처리위해 추가한 변수
     private boolean cellSizesSet = false;
     private int rowIconPadding = 6;
 
@@ -168,6 +170,25 @@ public class FileManager {
             tableScroll.setPreferredSize(
                     new Dimension((int) d.getWidth(), (int) d.getHeight() / 2));
             detailView.add(tableScroll, BorderLayout.CENTER);
+
+            //우클릭 처리 추가
+            mouseAdapter=
+                    new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            if (e.getButton() == MouseEvent.BUTTON3) {//if (e.isPopupTrigger()) {
+                                int row = table.rowAtPoint(e.getPoint());
+                                if (row >= 0 && row < table.getRowCount()) {
+                                    table.setRowSelectionInterval(row, row);
+                                } else {
+                                    table.clearSelection();
+                                }
+                                // 선택된 행에 대한 작업 수행
+                                JOptionPane.showMessageDialog(null, row + "번째 행을 클릭 했습니다.");
+                            }
+                        }
+                    };
+            table.addMouseListener(mouseAdapter);
 
             // the File tree
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
