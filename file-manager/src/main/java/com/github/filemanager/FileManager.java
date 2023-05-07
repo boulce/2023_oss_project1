@@ -173,6 +173,85 @@ public class FileManager {
                     new Dimension((int) d.getWidth(), (int) d.getHeight() / 2));
             detailView.add(tableScroll, BorderLayout.CENTER);
 
+
+            //Untracked를 위한 popup menu
+            JPopupMenu popupMenuUntracked = new JPopupMenu();
+            JMenuItem gitadd_Untracked = new JMenuItem("git add");
+            //gitadd_Untracked.addActionListener();
+            //gitadd_Untracked.addActionListener(new MyActionListener());
+            popupMenuUntracked.add(gitadd_Untracked);
+            table.setComponentPopupMenu(popupMenuUntracked);
+            gitadd_Untracked.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "gitadd_Untracked clicked");
+                }
+            });
+
+            //Modified를 위한 popup menu
+            JPopupMenu popupMenuModified = new JPopupMenu();
+            JMenuItem gitadd_Modified = new JMenuItem("git add");
+            JMenuItem gitresotre_Modified = new JMenuItem("git restore");
+            popupMenuModified.add(gitadd_Modified);
+            popupMenuModified.add(gitresotre_Modified);
+            table.setComponentPopupMenu(popupMenuModified);
+            gitadd_Modified.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "gitadd_Modified clicked");
+                }
+            });
+            gitresotre_Modified.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "gitresotre_Modified clicked");
+                }
+            });
+
+            //staged(==Added)를 위한 popup menu
+            JPopupMenu popupMenuStaged = new JPopupMenu();
+            JMenuItem gitresotre_Staged = new JMenuItem("git restore --staged");
+                //JMenuItem gitcommit_Staged = new JMenuItem("git commit -m"); 해솔&하빈이 버튼으로 구현
+            popupMenuStaged.add(gitresotre_Staged);
+                //popupMenuStaged.add(gitcommit_Staged);
+            table.setComponentPopupMenu(popupMenuStaged);
+            gitresotre_Staged.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "gitresotre_Staged clicked");
+                }
+            });
+
+
+            //Commited를 위한 popup menu
+            JPopupMenu popupMenuCommited = new JPopupMenu();
+            JMenuItem gitrm_cached = new JMenuItem("git rm --cached");
+            JMenuItem gitrm = new JMenuItem("git rm");
+            JMenuItem gitmv = new JMenuItem("git mv");
+            popupMenuCommited.add(gitrm_cached);
+            popupMenuCommited.add(gitrm);
+            popupMenuCommited.add(gitmv);
+            table.setComponentPopupMenu(popupMenuCommited);
+            gitrm_cached.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "git rm --cached clicked");
+                }
+            });
+
+            gitrm.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "git rm clicked");
+                }
+            });
+            gitmv.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "git mv clicked");
+                }
+            });
+
             //우클릭 처리 추가
             mouseAdapter=
                     new MouseAdapter() {
@@ -188,15 +267,15 @@ public class FileManager {
 
                                 // 선택된 행에 대한 작업 수행
                                 String filepath = ((FileTableModel) table.getModel()).getFile(row).getPath();
-                                JOptionPane.showMessageDialog(null, row + "번째 행" + filepath);
+                                //JOptionPane.showMessageDialog(null, row + "번째 행" + filepath);
 
                                 if(isGitRepository(new File(filepath))){
-                                    JOptionPane.showMessageDialog(null, "깃으로 관리중입니다.");
+                                    //JOptionPane.showMessageDialog(null, "깃으로 관리중입니다.");
                                     File file = getGitRepository(new File(filepath));
-                                    JOptionPane.showMessageDialog(null, file.getPath());
+                                    //JOptionPane.showMessageDialog(null, file.getPath());
 
                                     try (Repository repo = Git.open(file).getRepository()) {
-                                        JOptionPane.showMessageDialog(null, "실행");
+                                        //JOptionPane.showMessageDialog(null, "실행");
                                         Git git = new Git(repo);
 
                                         // git status 명령 실행
@@ -238,16 +317,20 @@ public class FileManager {
                                         }
                                         //JOptionPane.showMessageDialog(null, filepath);
                                         if(unTracted.contains(filepath)){// untracked 파일일 경우
-                                            JOptionPane.showMessageDialog(null, "untracked");
+                                            //JOptionPane.showMessageDialog(null, "untracked");
+                                            popupMenuUntracked.show(e.getComponent(), e.getX(), e.getY());
                                         }
                                         else if(Modified.contains(filepath)){
-                                            JOptionPane.showMessageDialog(null, "Modified");
+                                            //JOptionPane.showMessageDialog(null, "Modified");
+                                            popupMenuModified.show(e.getComponent(), e.getX(), e.getY());
                                         }
                                         else if(Added.contains(filepath)){
-                                            JOptionPane.showMessageDialog(null, "staged");
+                                            //JOptionPane.showMessageDialog(null, "staged");
+                                            popupMenuStaged.show(e.getComponent(), e.getX(), e.getY());
                                         }
                                         else{
-                                            JOptionPane.showMessageDialog(null, "Commited");
+                                            //JOptionPane.showMessageDialog(null, "Commited");
+                                            popupMenuCommited.show(e.getComponent(), e.getX(), e.getY());
                                         }
 
                                         // modified 파일일 경우
