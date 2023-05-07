@@ -127,15 +127,25 @@ public class FileManager {
     private JButton newFile;
     private JButton copyFile;
     /* File details. */
+
+    // copyfile 기능 없앰
+    // private JButton copyFile;
+
+    //git init 추가가
+   private JButton gitinit;
+
     private JLabel fileName;
     private JTextField path;
     private JLabel date;
     private JLabel size;
+
+    /* 체크박스 기능 주석 처리함
     private JCheckBox readable;
     private JCheckBox writable;
     private JCheckBox executable;
     private JRadioButton isDirectory;
     private JRadioButton isFile;
+    */
 
     /* GUI options/containers for new File/Directory creation.  Created lazily. */
     private JPanel newFilePanel;
@@ -158,6 +168,7 @@ public class FileManager {
             table.setAutoCreateRowSorter(true);
             table.setShowVerticalLines(false);
 
+            //선택된 행의 detail 보여줌
             listSelectionListener =
                     new ListSelectionListener() {
                         @Override
@@ -355,6 +366,7 @@ public class FileManager {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
             treeModel = new DefaultTreeModel(root);
 
+            //선택된 행의 detail 보여줌
             TreeSelectionListener treeSelectionListener =
                     new TreeSelectionListener() {
                         public void valueChanged(TreeSelectionEvent tse) {
@@ -366,6 +378,8 @@ public class FileManager {
                     };
 
             // show the file system roots.
+
+            // 여기가 시스템 루트??
             File[] roots = fileSystemView.getRoots();
             for (File fileSystemRoot : roots) {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
@@ -378,7 +392,7 @@ public class FileManager {
                         node.add(new DefaultMutableTreeNode(file));
                     }
                 }
-                //
+
             }
 
             tree = new JTree(treeModel);
@@ -395,7 +409,7 @@ public class FileManager {
             Dimension widePreferred = new Dimension(200, (int) preferredSize.getHeight());
             treeScroll.setPreferredSize(widePreferred);
 
-            // details for a File
+            // details for a File, 우측 상단, 선택된 폴더의 테이블
             JPanel fileMainDetails = new JPanel(new BorderLayout(4, 2));
             fileMainDetails.setBorder(new EmptyBorder(0, 6, 0, 6));
 
@@ -420,15 +434,16 @@ public class FileManager {
             fileDetailsValues.add(size);
             fileDetailsLabels.add(new JLabel("Type", JLabel.TRAILING));
 
+            /* 아래쪽 버튼 옆에 있던 체크박스 삭제
             JPanel flags = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
             isDirectory = new JRadioButton("Directory");
             isDirectory.setEnabled(false);
             flags.add(isDirectory);
-
             isFile = new JRadioButton("File");
             isFile.setEnabled(false);
             flags.add(isFile);
             fileDetailsValues.add(flags);
+            */
 
             int count = fileDetailsLabels.getComponentCount();
             for (int ii = 0; ii < count; ii++) {
@@ -439,6 +454,8 @@ public class FileManager {
             // mnemonics stop working in a floated toolbar
             toolBar.setFloatable(false);
 
+            // 아래쪽 버튼 생성
+            // 1. Open
             openFile = new JButton("Open");
             openFile.setMnemonic('o');
 
@@ -455,6 +472,7 @@ public class FileManager {
                     });
             toolBar.add(openFile);
 
+            //2. Edit
             editFile = new JButton("Edit");
             editFile.setMnemonic('e');
             editFile.addActionListener(
@@ -469,6 +487,7 @@ public class FileManager {
                     });
             toolBar.add(editFile);
 
+            //2. Edit
             printFile = new JButton("Print");
             printFile.setMnemonic('p');
             printFile.addActionListener(
@@ -490,6 +509,7 @@ public class FileManager {
 
             toolBar.addSeparator();
 
+            //3. New
             newFile = new JButton("New");
             newFile.setMnemonic('n');
             newFile.addActionListener(
@@ -500,6 +520,8 @@ public class FileManager {
                     });
             toolBar.add(newFile);
 
+
+            /* Copy 버튼 삭제
             copyFile = new JButton("Copy");
             copyFile.setMnemonic('c');
             copyFile.addActionListener(
@@ -510,6 +532,9 @@ public class FileManager {
                     });
             toolBar.add(copyFile);
 
+             */
+
+            // 4. Rename
             JButton renameFile = new JButton("Rename");
             renameFile.setMnemonic('r');
             renameFile.addActionListener(
@@ -520,6 +545,7 @@ public class FileManager {
                     });
             toolBar.add(renameFile);
 
+            //6. Delete
             deleteFile = new JButton("Delete");
             deleteFile.setMnemonic('d');
             deleteFile.addActionListener(
@@ -531,6 +557,20 @@ public class FileManager {
             toolBar.add(deleteFile);
 
             toolBar.addSeparator();
+
+            //git 기능 버튼 생성
+            // 1. git init
+            gitinit = new JButton("Git init");
+            gitinit.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            gitinit();
+                        }
+                    }
+            );
+            toolBar.add(gitinit);
+            /* 버튼 옆에 있던 체크 박스 삭제
 
             readable = new JCheckBox("Read  ");
             readable.setMnemonic('a');
@@ -546,7 +586,9 @@ public class FileManager {
             executable.setMnemonic('x');
             // executable.setEnabled(false);
             toolBar.add(executable);
+             */
 
+            //패널 생성
             JPanel fileView = new JPanel(new BorderLayout(3, 3));
 
             fileView.add(toolBar, BorderLayout.NORTH);
@@ -630,6 +672,13 @@ public class FileManager {
         }
         gui.repaint();
     }
+
+    //1. Git init 함수 구현
+    private void gitinit() {
+        //(1) 어느 하나의 상위 폴더에 .git 있는 경우 비활성화
+        //(2) 없는 경우 버튼 활성화
+    }
+
 
     private void deleteFile() {
         if (currentFile == null) {
@@ -859,12 +908,14 @@ public class FileManager {
         path.setText(file.getPath());
         date.setText(new Date(file.lastModified()).toString());
         size.setText(file.length() + " bytes");
+         /* 파일 디테일 부분 체크박스 삭제
         readable.setSelected(file.canRead());
         writable.setSelected(file.canWrite());
         executable.setSelected(file.canExecute());
         isDirectory.setSelected(file.isDirectory());
-
         isFile.setSelected(file.isFile());
+        */
+
 
         JFrame f = (JFrame) gui.getTopLevelAncestor();
         if (f != null) {
@@ -874,19 +925,18 @@ public class FileManager {
         gui.repaint();
     }
 
+
+    /*
+    Copy 기능 삭제
     public static boolean copyFile(File from, File to) throws IOException {
-
         boolean created = to.createNewFile();
-
         if (created) {
             FileChannel fromChannel = null;
             FileChannel toChannel = null;
             try {
                 fromChannel = new FileInputStream(from).getChannel();
                 toChannel = new FileOutputStream(to).getChannel();
-
                 toChannel.transferFrom(fromChannel, 0, fromChannel.size());
-
                 // set the flags of the to the same as the from
                 to.setReadable(from.canRead());
                 to.setWritable(from.canWrite());
@@ -903,6 +953,7 @@ public class FileManager {
         }
         return created;
     }
+    */
 
     public static void main(String[] args) throws IOException, GitAPIException {
         SwingUtilities.invokeLater(
