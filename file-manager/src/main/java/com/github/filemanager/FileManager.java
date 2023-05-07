@@ -202,10 +202,10 @@ public class FileManager {
                                         // git status 명령 실행
                                         Status status = git.status().call();
 
-                                        JOptionPane.showMessageDialog(null, "untracked" + status.getUntracked());
-                                        JOptionPane.showMessageDialog(null, "Modified" + status.getModified());
-                                        JOptionPane.showMessageDialog(null, "Added" + status.getAdded());
-                                        JOptionPane.showMessageDialog(null, "uncommit " + status.hasUncommittedChanges());
+                                        //JOptionPane.showMessageDialog(null, "untracked" + status.getUntracked());
+                                        //JOptionPane.showMessageDialog(null, "Modified" + status.getModified());
+                                        //JOptionPane.showMessageDialog(null, "Added" + status.getAdded());
+                                        //JOptionPane.showMessageDialog(null, "uncommit " + status.hasUncommittedChanges());
                                         //JOptionPane.showMessageDialog(null, status.getChanged());
                                         //JOptionPane.showMessageDialog(null, status.getMissing());
                                         //JOptionPane.showMessageDialog(null, status.getRemoved());
@@ -214,18 +214,22 @@ public class FileManager {
                                         Set<String> unTracted = new HashSet<String>();
                                         Iterator<String> stringIter = getUntrackedset.iterator();
                                         while(stringIter.hasNext()){
-                                            unTracted.add(getAbsolutePath(stringIter.next())); // 1 2 3
+                                            String str = stringIter.next();
+                                            unTracted.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+
                                         }
+                                        //JOptionPane.showMessageDialog(null, filepath);
 
                                         // untracked 파일일 경우
-                                        if(status.getUntracked().contains(filepath)){
+                                        if(unTracted.contains(filepath)){
                                             JOptionPane.showMessageDialog(null, "untracked");
-                                        }
-                                        else{
-                                            JOptionPane.showMessageDialog(null, "asdfasdfasdf");
 
                                         }
-
+                                        // modified 파일일 경우
+                                        // added 파일일 경우 (staged)
+                                        // commited 파일일 경우 == untrac modifi added 모두 아닐 경우
+                                        
                                     } catch (IOException ex) {
                                         JOptionPane.showMessageDialog(null, "오류1");
 
