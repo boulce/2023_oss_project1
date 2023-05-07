@@ -28,14 +28,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
 import java.net.URL;
-import java.nio.channels.FileChannel;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -49,12 +45,10 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import static com.github.filemanager.GitUtilsForTrack.*;
 
@@ -169,7 +163,6 @@ public class FileManager {
             table.setAutoCreateRowSorter(true);
             table.setShowVerticalLines(false);
 
-            //선택된 행의 detail 보여줌
             listSelectionListener =
                     new ListSelectionListener() {
                         @Override
@@ -347,7 +340,7 @@ public class FileManager {
 
                                         // modified 파일일 경우
                                         // added 파일일 경우 (staged)
-                                        // commited 파일일 경우 == untrac modifi added 모두 아닐 경우
+                                        // commited 파일일 경우 == untracked modified added 모두 아닐 경우
                                         
                                     } catch (IOException ex) {
                                         JOptionPane.showMessageDialog(null, "오류1");
@@ -367,7 +360,6 @@ public class FileManager {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
             treeModel = new DefaultTreeModel(root);
 
-            //선택된 행의 detail 보여줌
             TreeSelectionListener treeSelectionListener =
                     new TreeSelectionListener() {
                         public void valueChanged(TreeSelectionEvent tse) {
@@ -380,7 +372,6 @@ public class FileManager {
 
             // show the file system roots.
 
-            // 여기가 시스템 루트??
             File[] roots = fileSystemView.getRoots();
             for (File fileSystemRoot : roots) {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
@@ -559,10 +550,9 @@ public class FileManager {
 
             toolBar.addSeparator();
 
-            //git 기능 버튼 생성
-            // 1. git init
-            gitinit = new JButton("Git init");
-            gitinit.addActionListener(
+
+            JButton gitInit = new JButton("Git init");
+            gitInit.addActionListener(
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -570,9 +560,10 @@ public class FileManager {
                         }
                     }
             );
-            toolBar.add(gitinit);
+            toolBar.add(gitInit);
 
             // 2. git commit
+            // (1) staged  된 파일이 있는 경우 ->버튼 보이게
             gitcommit = new JButton("Git commit");
             gitcommit.addActionListener(
                     new ActionListener() {
@@ -584,8 +575,9 @@ public class FileManager {
             );
             toolBar.add(gitcommit);
 
-            /* 버튼 옆에 있던 체크 박스 삭제
+            // (2) staged 된 파일 없는 경우 -> 버튼 안보이게
 
+            /* 버튼 옆에 있던 체크 박스 삭제
             readable = new JCheckBox("Read  ");
             readable.setMnemonic('a');
             // readable.setEnabled(false);
@@ -602,7 +594,6 @@ public class FileManager {
             toolBar.add(executable);
              */
 
-            //패널 생성
             JPanel fileView = new JPanel(new BorderLayout(3, 3));
 
             fileView.add(toolBar, BorderLayout.NORTH);
@@ -689,19 +680,31 @@ public class FileManager {
 
     //1. Git Init 함수 구현
     private void gitInit() {
-        //(1) 어느 하나의 상위 폴더에 .git 있는 경우 비활성화
-        //(2) 없는 경우 버튼 활성화
+        //git init 실행하는 코드 작성
     }
+
 
     //2. Git commit 구현
     private void gitCommit() {
-        //(1) staged 된 파일이 1개 이상인 경우 활성화
-            /*
-            A. 상단에 staged 파일 목록 보여줌
-            B. 하단에 commit message 입력
-            C. confirm 하면, commit 되고 파일 상태 바뀜
-             */
-        //(2)
+
+        /*staged 리스트 띄우기
+        String filepath = currentFile.getPath();
+        File file = getGitRepository(new File(filepath));
+        Repository repo = Git.open(file).getRepository();
+
+        Git git = new Git(repo);
+        Status status = git.status().call();
+        status.getAdded();
+*/
+        String message = JOptionPane.showInputDialog(null, "Enter commit message.");
+
+        if (message != null && !message.isEmpty()) { // 메시지가 입력되었으면
+            int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to commit this file?\n" + "The message is : " + message, "Confirmation", JOptionPane.YES_NO_OPTION);
+
+            if (result == JOptionPane.OK_OPTION) { // 확인 버튼을 눌렀을 때
+                JOptionPane.showMessageDialog(null, "Commited successfully!", "Information", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
     }
 
 
