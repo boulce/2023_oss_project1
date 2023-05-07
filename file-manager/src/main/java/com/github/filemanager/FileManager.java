@@ -36,9 +36,7 @@ import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -53,9 +51,13 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+
+import static com.github.filemanager.GitUtilsForTrack.*;
+
 
 /**
  * A basic File Manager. Requires 1.6+ for the Desktop &amp; SwingWorker classes, amongst other
@@ -183,8 +185,56 @@ public class FileManager {
                                 } else {
                                     table.clearSelection();
                                 }
+
                                 // 선택된 행에 대한 작업 수행
-                                JOptionPane.showMessageDialog(null, row + "번째 행을 클릭 했습니다.");
+                                String filepath = ((FileTableModel) table.getModel()).getFile(row).getPath();
+                                JOptionPane.showMessageDialog(null, row + "번째 행" + filepath);
+
+                                if(isGitRepository(new File(filepath))){
+                                    JOptionPane.showMessageDialog(null, "깃으로 관리중입니다.");
+                                    File file = getGitRepository(new File(filepath));
+                                    JOptionPane.showMessageDialog(null, file.getPath());
+
+                                    try (Repository repo = Git.open(file).getRepository()) {
+                                        JOptionPane.showMessageDialog(null, "실행");
+                                        Git git = new Git(repo);
+
+                                        // git status 명령 실행
+                                        Status status = git.status().call();
+
+                                        JOptionPane.showMessageDialog(null, "untracked" + status.getUntracked());
+                                        JOptionPane.showMessageDialog(null, "Modified" + status.getModified());
+                                        JOptionPane.showMessageDialog(null, "Added" + status.getAdded());
+                                        JOptionPane.showMessageDialog(null, "uncommit " + status.hasUncommittedChanges());
+                                        //JOptionPane.showMessageDialog(null, status.getChanged());
+                                        //JOptionPane.showMessageDialog(null, status.getMissing());
+                                        //JOptionPane.showMessageDialog(null, status.getRemoved());
+
+                                        Set<String> getUntrackedset = status.getUntracked();
+                                        Set<String> unTracted = new HashSet<String>();
+                                        Iterator<String> stringIter = getUntrackedset.iterator();
+                                        while(stringIter.hasNext()){
+                                            unTracted.add(getAbsolutePath(stringIter.next())); // 1 2 3
+                                        }
+
+                                        // untracked 파일일 경우
+                                        if(status.getUntracked().contains(filepath)){
+                                            JOptionPane.showMessageDialog(null, "untracked");
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "asdfasdfasdf");
+
+                                        }
+
+                                    } catch (IOException ex) {
+                                        JOptionPane.showMessageDialog(null, "오류1");
+
+                                    } catch (GitAPIException ex) {
+                                        JOptionPane.showMessageDialog(null, "오류2");                                }
+                                    }
+                                else{
+                                    JOptionPane.showMessageDialog(null, "깃으로 관리중이지 않습니다.");
+                                }
                             }
                         }
                     };
@@ -906,3 +956,4 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         return label;
     }
 }
+
