@@ -131,8 +131,9 @@ public class FileManager {
     // copyfile 기능 없앰
     // private JButton copyFile;
 
-    //git init 추가가
+    //git init 추가, git commit  추가
    private JButton gitinit;
+   private JButton gitcommit;
 
     private JLabel fileName;
     private JTextField path;
@@ -565,11 +566,24 @@ public class FileManager {
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            gitinit();
+                            gitInit();
                         }
                     }
             );
             toolBar.add(gitinit);
+
+            // 2. git commit
+            gitcommit = new JButton("Git commit");
+            gitcommit.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            gitCommit();
+                        }
+                    }
+            );
+            toolBar.add(gitcommit);
+
             /* 버튼 옆에 있던 체크 박스 삭제
 
             readable = new JCheckBox("Read  ");
@@ -673,10 +687,21 @@ public class FileManager {
         gui.repaint();
     }
 
-    //1. Git init 함수 구현
-    private void gitinit() {
+    //1. Git Init 함수 구현
+    private void gitInit() {
         //(1) 어느 하나의 상위 폴더에 .git 있는 경우 비활성화
         //(2) 없는 경우 버튼 활성화
+    }
+
+    //2. Git commit 구현
+    private void gitCommit() {
+        //(1) staged 된 파일이 1개 이상인 경우 활성화
+            /*
+            A. 상단에 staged 파일 목록 보여줌
+            B. 하단에 commit message 입력
+            C. confirm 하면, commit 되고 파일 상태 바뀜
+             */
+        //(2)
     }
 
 
