@@ -216,16 +216,40 @@ public class FileManager {
                                         while(stringIter.hasNext()){
                                             String str = stringIter.next();
                                             unTracted.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
-                                            JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                        }
 
+                                        Set<String> getModifiedset = status.getModified();
+                                        Set<String> Modified = new HashSet<String>();
+                                        stringIter = getModifiedset.iterator();
+                                        while(stringIter.hasNext()){
+                                            String str = stringIter.next();
+                                            Modified.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                        }
+
+                                        Set<String> getAddedset = status.getAdded();
+                                        Set<String> Added = new HashSet<String>();
+                                        stringIter = getAddedset.iterator();
+                                        while(stringIter.hasNext()){
+                                            String str = stringIter.next();
+                                            Added.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
                                         }
                                         //JOptionPane.showMessageDialog(null, filepath);
-
-                                        // untracked 파일일 경우
-                                        if(unTracted.contains(filepath)){
+                                        if(unTracted.contains(filepath)){// untracked 파일일 경우
                                             JOptionPane.showMessageDialog(null, "untracked");
-
                                         }
+                                        else if(Modified.contains(filepath)){
+                                            JOptionPane.showMessageDialog(null, "Modified");
+                                        }
+                                        else if(Added.contains(filepath)){
+                                            JOptionPane.showMessageDialog(null, "staged");
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Commited");
+                                        }
+
                                         // modified 파일일 경우
                                         // added 파일일 경우 (staged)
                                         // commited 파일일 경우 == untrac modifi added 모두 아닐 경우
