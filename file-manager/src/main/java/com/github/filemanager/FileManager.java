@@ -41,7 +41,7 @@ import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 import org.apache.commons.io.FileUtils;
-
+import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -699,16 +699,20 @@ public class FileManager {
 
     //2. Git commit 구현
     private void gitCommit() throws IOException {
-        //if(Added.contains(filepath)) { //staged인 파일이 1개 이상 존재하는 경우 - 현재는 모든 파일 다 띄움
+        //if(Added.contains(filepath)) { //staged인 파일이 1개 이상 존재하는 경우
         //표에 나타내기
         JPanel panel = new JPanel(new BorderLayout());
         JTextField textField = new JTextField();
         JLabel messageLabel = new JLabel(" Please enter your commit message. : \n");
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        //빈 테이블에 staged 된 파일 불러오기
+        JTable table = new JTable(new DefaultTableModel(new Object[]{"Icon", "File", "Path/name"}, 0));
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+
         bottomPanel.add(messageLabel, BorderLayout.WEST);
         bottomPanel.add(textField, BorderLayout.CENTER);
+
         panel.add(bottomPanel, BorderLayout.SOUTH);
         int result = JOptionPane.showConfirmDialog(null, panel, "Commit message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
