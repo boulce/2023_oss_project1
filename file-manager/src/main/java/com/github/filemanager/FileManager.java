@@ -386,8 +386,8 @@ public class FileManager {
                         node.add(new DefaultMutableTreeNode(file));
                     }
                 }
-                //
             }
+
 
             tree = new JTree(treeModel);
             tree.setRootVisible(false);
@@ -699,53 +699,39 @@ public class FileManager {
 
     //2. Git commit 구현
     private void gitCommit() throws IOException {
-        String filepath = (System.getProperty("user.dir")); //여기를 현재 폴더 위치 string 으로 바꿔서 string filepath 에 넣어주기 -현재 폴더 위치가 저게 맞나? 현재 보고 있는 위치를 user.dir로 표현하나?
-        File file = getGitRepository(new File(filepath)); //현재 폴더에서 .git 파일을 file에 저장
-        File parentFile = currentFile.getParentFile(); //git의 "상위 폴더"를 parentFile에 저장하고, parentFile의 모든 파일의 git 상태 읽어오기
+        //if(Added.contains(filepath)) { //staged인 파일이 1개 이상 존재하는 경우 - 현재는 모든 파일 다 띄움
+        //표에 나타내기
+        JPanel panel = new JPanel(new BorderLayout());
+        JTextField textField = new JTextField();
+        JLabel messageLabel = new JLabel(" Please enter your commit message. : \n");
 
-        try (Repository repo = Git.open(file).getRepository()) {//.git 파일을 repo에 저장
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.add(messageLabel, BorderLayout.WEST);
+        bottomPanel.add(textField, BorderLayout.CENTER);
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+        int result = JOptionPane.showConfirmDialog(null, panel, "Commit message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-            Git git = new Git(repo);
-            Status status = git.status().call();
-            Set<String> Added = new HashSet<String>();
-            for (String addedFile : status.getAdded()) {
-                Added.add(parentFile.toPath().resolve(addedFile).toString());
+        // 확인 버튼을 눌렀을 때의 동작
+        if (result == JOptionPane.OK_OPTION) {
+            String message = textField.getText();
+
+            // Confirm 팝업창 생성
+            result = JOptionPane.showConfirmDialog(null, "Are you sure you want to commit this file?\n"  + "The message is : " + message,"Yes", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+            if (result == JOptionPane.YES_OPTION) {
+                // Yes를 눌렀을 때의 동작
+                JOptionPane.showMessageDialog(null, "Commited successfully!", "알림", JOptionPane.INFORMATION_MESSAGE);
+                //여기에 Git commit 구현하기
+            } else {
+                // No를 눌렀을 때의 동작
+                JOptionPane.showMessageDialog(null, "Commit cancelled", "알림", JOptionPane.INFORMATION_MESSAGE);
             }
-            Files.walk(Paths.get(parentFile.getAbsolutePath())) //파일을 읽어오기
-                    .filter(Files::isRegularFile)
-                    .forEach(path -> {
-                        if(Added.contains(filepath)) { //파일이 staged인 경우
-                           //표에 나타내기
-                            JPanel panel = new JPanel(new BorderLayout());
-                            JTextField textField = new JTextField();
-
-                            panel.add(new JScrollPane(table), BorderLayout.CENTER);
-                            panel.add(textField, BorderLayout.SOUTH);
-                            int result = JOptionPane.showConfirmDialog(null, panel, "Commit message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-                            // 확인 버튼을 눌렀을 때의 동작
-                            if (result == JOptionPane.OK_OPTION) {
-                                String message = textField.getText();
-
-                                // Confirm 팝업창 생성
-                                result = JOptionPane.showConfirmDialog(null, "Are you sure you want to commit this file?\n"  + "The message is : " + message,"Yes", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-                                if (result == JOptionPane.YES_OPTION) {
-                                    // Yes를 눌렀을 때의 동작
-                                    JOptionPane.showMessageDialog(null, "Commited successfully!", "알림", JOptionPane.INFORMATION_MESSAGE);
-                                } else {
-                                    // No를 눌렀을 때의 동작
-                                    JOptionPane.showMessageDialog(null, "Commit cancelled", "알림", JOptionPane.INFORMATION_MESSAGE);
-                                }
-                            }
-                        }
-                    });
         }
-            catch (GitAPIException e) {
-            throw new RuntimeException(e);
-        }
-
     }
+
+
+
 
     private void deleteFile() {
         if (currentFile == null) {
@@ -1168,7 +1154,7 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
             int row,
             boolean hasFocus) {
         //시작 노드를 루트폴더로 설정
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new File("C:\\"));
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
         File file = (File) node.getUserObject();
         label.setIcon(fileSystemView.getSystemIcon(file));
         label.setText(fileSystemView.getSystemDisplayName(file));
