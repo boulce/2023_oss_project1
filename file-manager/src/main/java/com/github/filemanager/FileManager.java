@@ -44,7 +44,10 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import org.apache.commons.io.LineIterator;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -86,6 +89,7 @@ public class FileManager {
     public static final String APP_TITLE = "FileMan";
     /** Used to open/edit/print files. */
     private Desktop desktop;
+
     /** Provides nice icons and names for files. */
     private FileSystemView fileSystemView;
 
@@ -325,23 +329,21 @@ public class FileManager {
                                             //JOptionPane.showMessageDialog(null, "untracked");
                                             popupMenuUntracked.show(e.getComponent(), e.getX(), e.getY());
                                         }
-                                        else if(Modified.contains(filepath)){
+                                        else if(Modified.contains(filepath)){//Modified 파일인 경우
                                             //JOptionPane.showMessageDialog(null, "Modified");
                                             popupMenuModified.show(e.getComponent(), e.getX(), e.getY());
                                         }
-                                        else if(Added.contains(filepath)){
-                                            //JOptionPane.showMessageDialog(null, "staged");
+                                        else if(Added.contains(filepath)){//Staged 파일인 경우
+                                            //JOptionPane.showMessageDialog(null, "Staged");
                                             popupMenuStaged.show(e.getComponent(), e.getX(), e.getY());
                                         }
-                                        else{
+                                        else{ // commited 파일일 경우 == untracked modified added 모두 아닐 경우
                                             //JOptionPane.showMessageDialog(null, "Commited");
                                             popupMenuCommited.show(e.getComponent(), e.getX(), e.getY());
                                         }
 
-                                        // modified 파일일 경우
-                                        // added 파일일 경우 (staged)
-                                        // commited 파일일 경우 == untracked modified added 모두 아닐 경우
-                                        
+
+
                                     } catch (IOException ex) {
                                         JOptionPane.showMessageDialog(null, "오류1");
 
@@ -349,7 +351,7 @@ public class FileManager {
                                         JOptionPane.showMessageDialog(null, "오류2");                                }
                                     }
                                 else{
-                                    JOptionPane.showMessageDialog(null, "깃으로 관리중이지 않습니다.");
+                                    JOptionPane.showMessageDialog(null, "깃으로 관리 중이지 않습니다.");
                                 }
                             }
                         }
@@ -359,6 +361,7 @@ public class FileManager {
             // the File tree
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
             treeModel = new DefaultTreeModel(root);
+
 
             TreeSelectionListener treeSelectionListener =
                     new TreeSelectionListener() {
@@ -371,7 +374,6 @@ public class FileManager {
                     };
 
             // show the file system roots.
-
             File[] roots = fileSystemView.getRoots();
             for (File fileSystemRoot : roots) {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
@@ -384,7 +386,7 @@ public class FileManager {
                         node.add(new DefaultMutableTreeNode(file));
                     }
                 }
-
+                //
             }
 
             tree = new JTree(treeModel);
@@ -401,7 +403,7 @@ public class FileManager {
             Dimension widePreferred = new Dimension(200, (int) preferredSize.getHeight());
             treeScroll.setPreferredSize(widePreferred);
 
-            // details for a File, 우측 상단, 선택된 폴더의 테이블
+            // details for a File
             JPanel fileMainDetails = new JPanel(new BorderLayout(4, 2));
             fileMainDetails.setBorder(new EmptyBorder(0, 6, 0, 6));
 
@@ -550,32 +552,43 @@ public class FileManager {
 
             toolBar.addSeparator();
 
-
+            //1. git init 버튼
             JButton gitInit = new JButton("Git init");
             gitInit.addActionListener(
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            gitInit();
+                           /* File directory = new File(".");
+                            if(isGitRepository(directory)){//(1) 현재 폴더가 git으로 관리되는 경우
+                                //버튼 누르면 = gitInit();
+                            }
+                            else{//(2) 현재 폴더가 git으로 관리되고 있지 않은 경우
+                                //버튼 안보임
+                            }
+
+
+                            */
                         }
                     }
             );
             toolBar.add(gitInit);
 
-            // 2. git commit
-            // (1) staged  된 파일이 있는 경우 ->버튼 보이게
+            // 2. git commit 버튼
             gitcommit = new JButton("Git commit");
             gitcommit.addActionListener(
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            gitCommit();
+                            try {
+                                gitCommit();
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );
             toolBar.add(gitcommit);
 
-            // (2) staged 된 파일 없는 경우 -> 버튼 안보이게
 
             /* 버튼 옆에 있던 체크 박스 삭제
             readable = new JCheckBox("Read  ");
@@ -681,32 +694,58 @@ public class FileManager {
     //1. Git Init 함수 구현
     private void gitInit() {
         //git init 실행하는 코드 작성
-    }
 
+    }
 
     //2. Git commit 구현
-    private void gitCommit() {
+    private void gitCommit() throws IOException {
+        String filepath = (System.getProperty("user.dir")); //여기를 현재 폴더 위치 string 으로 바꿔서 string filepath 에 넣어주기 -현재 폴더 위치가 저게 맞나? 현재 보고 있는 위치를 user.dir로 표현하나?
+        File file = getGitRepository(new File(filepath)); //현재 폴더에서 .git 파일을 file에 저장
+        File parentFile = currentFile.getParentFile(); //git의 "상위 폴더"를 parentFile에 저장하고, parentFile의 모든 파일의 git 상태 읽어오기
 
-        /*staged 리스트 띄우기
-        String filepath = currentFile.getPath();
-        File file = getGitRepository(new File(filepath));
-        Repository repo = Git.open(file).getRepository();
+        try (Repository repo = Git.open(file).getRepository()) {//.git 파일을 repo에 저장
 
-        Git git = new Git(repo);
-        Status status = git.status().call();
-        status.getAdded();
-*/
-        String message = JOptionPane.showInputDialog(null, "Enter commit message.");
-
-        if (message != null && !message.isEmpty()) { // 메시지가 입력되었으면
-            int result = JOptionPane.showConfirmDialog(null, "Are you sure you want to commit this file?\n" + "The message is : " + message, "Confirmation", JOptionPane.YES_NO_OPTION);
-
-            if (result == JOptionPane.OK_OPTION) { // 확인 버튼을 눌렀을 때
-                JOptionPane.showMessageDialog(null, "Commited successfully!", "Information", JOptionPane.INFORMATION_MESSAGE);
+            Git git = new Git(repo);
+            Status status = git.status().call();
+            Set<String> Added = new HashSet<String>();
+            for (String addedFile : status.getAdded()) {
+                Added.add(parentFile.toPath().resolve(addedFile).toString());
             }
-        }
-    }
+            Files.walk(Paths.get(parentFile.getAbsolutePath())) //파일을 읽어오기
+                    .filter(Files::isRegularFile)
+                    .forEach(path -> {
+                        if(Added.contains(filepath)) { //파일이 staged인 경우
+                           //표에 나타내기
+                            JPanel panel = new JPanel(new BorderLayout());
+                            JTextField textField = new JTextField();
 
+                            panel.add(new JScrollPane(table), BorderLayout.CENTER);
+                            panel.add(textField, BorderLayout.SOUTH);
+                            int result = JOptionPane.showConfirmDialog(null, panel, "Commit message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+                            // 확인 버튼을 눌렀을 때의 동작
+                            if (result == JOptionPane.OK_OPTION) {
+                                String message = textField.getText();
+
+                                // Confirm 팝업창 생성
+                                result = JOptionPane.showConfirmDialog(null, "Are you sure you want to commit this file?\n"  + "The message is : " + message,"Yes", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                                if (result == JOptionPane.YES_OPTION) {
+                                    // Yes를 눌렀을 때의 동작
+                                    JOptionPane.showMessageDialog(null, "Commited successfully!", "알림", JOptionPane.INFORMATION_MESSAGE);
+                                } else {
+                                    // No를 눌렀을 때의 동작
+                                    JOptionPane.showMessageDialog(null, "Commit cancelled", "알림", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            }
+                        }
+                    });
+        }
+            catch (GitAPIException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     private void deleteFile() {
         if (currentFile == null) {
@@ -1128,8 +1167,8 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
             boolean leaf,
             int row,
             boolean hasFocus) {
-
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+        //시작 노드를 루트폴더로 설정
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new File("C:\\"));
         File file = (File) node.getUserObject();
         label.setIcon(fileSystemView.getSystemIcon(file));
         label.setText(fileSystemView.getSystemDisplayName(file));
