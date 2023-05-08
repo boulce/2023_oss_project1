@@ -731,6 +731,18 @@ public class FileManager {
             //빈 테이블에 staged 된 파일 불러오기
             JTable table = new JTable(new DefaultTableModel(new Object[]{"Icon", "File", "Path/name"}, 0));
 
+            Status status = git.status().call();
+            Set<String> stagedSet = status.getAdded();
+
+            // 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            for(String stagedFile : stagedSet){
+                File stagedFILE = new File(stagedFile);
+
+                Object[] rowData = {null, stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                model.addRow(rowData);
+            }
+
             panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
             bottomPanel.add(messageLabel, BorderLayout.WEST);
@@ -762,9 +774,6 @@ public class FileManager {
             showErrorMessage(msg, "Commit Error");
         }
     }
-
-
-
 
     private void deleteFile() {
         if (currentFile == null) {
