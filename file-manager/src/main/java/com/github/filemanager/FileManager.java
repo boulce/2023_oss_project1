@@ -115,7 +115,7 @@ public class FileManager {
 
     private MouseAdapter mouseAdapter;//우클릭 처리위해 추가한 변수
     private boolean cellSizesSet = false;
-    private int rowIconPadding = 6;
+    private int rowIconPadding = 30; //우상단 테이블에서 행의 높이 결정 변수
 
     /* File controls. */
     private JButton openFile;
@@ -165,7 +165,7 @@ public class FileManager {
             JPanel detailView = new JPanel(new BorderLayout(3, 3));
             // fileTableModel = new FileTableModel();
 
-            table = new JTable();
+            table = new JTable(); //table: 우상단 파일 행렬의 swing 구현체
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             table.setAutoCreateRowSorter(true);
             table.setShowVerticalLines(false);
@@ -173,17 +173,19 @@ public class FileManager {
             listSelectionListener =
                     new ListSelectionListener() {
                         @Override
-                        public void valueChanged(ListSelectionEvent lse) {
-                            int row = table.getSelectionModel().getLeadSelectionIndex();
-                            setFileDetails(((FileTableModel) table.getModel()).getFile(row));
+                        public void valueChanged(ListSelectionEvent lse) { //우상단 테이블에서 행이 선택되면 호출된다. 파일 상세정보를 업데이트한다.
+                            int row = table.getSelectionModel().getLeadSelectionIndex(); //table에서 선택된 행중 가장 상단의 행의 인덱스 반환
+                            setFileDetails(((FileTableModel) table.getModel()).getFile(row)); //선택된 행의 File정보를 읽어 setFileDetails메소드를 실행한다.
                         }
                     };
             table.getSelectionModel().addListSelectionListener(listSelectionListener);
+
+
             JScrollPane tableScroll = new JScrollPane(table);
             Dimension d = tableScroll.getPreferredSize();
             tableScroll.setPreferredSize(
-                    new Dimension((int) d.getWidth(), (int) d.getHeight() / 2));
-            detailView.add(tableScroll, BorderLayout.CENTER);
+                    new Dimension((int) d.getWidth(), (int) d.getHeight())); //우상단 테이블 크기 조정
+            detailView.add(tableScroll, BorderLayout.CENTER); //우상단 테이블에 스크롤바 생성
 
 
             //Untracked를 위한 popup menu
@@ -394,7 +396,7 @@ public class FileManager {
                         }
                     };
 
-            // show the file system roots.
+            // show the file system roots. 왼쪽 루트 구조
             File[] roots = fileSystemView.getRoots();
             for (File fileSystemRoot : roots) {
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
@@ -425,7 +427,7 @@ public class FileManager {
             treeScroll.setPreferredSize(widePreferred);
 
             // details for a File
-            JPanel fileMainDetails = new JPanel(new BorderLayout(4, 2));
+            JPanel fileMainDetails = new JPanel(new BorderLayout(4, 2)); //우하단 회색영역 관련
             fileMainDetails.setBorder(new EmptyBorder(0, 6, 0, 6));
 
             JPanel fileDetailsLabels = new JPanel(new GridLayout(0, 1, 2, 2));
@@ -434,7 +436,7 @@ public class FileManager {
             JPanel fileDetailsValues = new JPanel(new GridLayout(0, 1, 2, 2));
             fileMainDetails.add(fileDetailsValues, BorderLayout.CENTER);
 
-            fileDetailsLabels.add(new JLabel("File", JLabel.TRAILING));
+            fileDetailsLabels.add(new JLabel("File", JLabel.TRAILING)); //우하단 회색영역
             fileName = new JLabel();
             fileDetailsValues.add(fileName);
             fileDetailsLabels.add(new JLabel("Path/name", JLabel.TRAILING));
@@ -630,7 +632,7 @@ public class FileManager {
             toolBar.add(executable);
              */
 
-            JPanel fileView = new JPanel(new BorderLayout(3, 3));
+            JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
             fileView.add(toolBar, BorderLayout.NORTH);
             fileView.add(fileMainDetails, BorderLayout.CENTER);
@@ -638,7 +640,7 @@ public class FileManager {
             detailView.add(fileView, BorderLayout.SOUTH);
 
             JSplitPane splitPane =
-                    new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll, detailView);
+                    new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treeScroll, detailView); //왼쪽 루트와 오른쪽 테이블,회색영역을 구분하는 코드 Vertical로 하면 위아래로 나온다.
             gui.add(splitPane, BorderLayout.CENTER);
 
             JPanel simpleOutput = new JPanel(new BorderLayout(3, 3));
@@ -923,11 +925,11 @@ public class FileManager {
                             setColumnWidth(3, 60);
                             table.getColumnModel().getColumn(3).setMaxWidth(120);
                             setColumnWidth(4, -1);
-                            setColumnWidth(5, -1);
-                            setColumnWidth(6, -1);
-                            setColumnWidth(7, -1);
-                            setColumnWidth(8, -1);
-                            setColumnWidth(9, -1);
+                            //setColumnWidth(5, -1); //우상단 테이블의 RWEDF관련 열 너비 설정
+                           // setColumnWidth(6, -1);
+                           // setColumnWidth(7, -1);
+                          //  setColumnWidth(8, -1);
+                           // setColumnWidth(9, -1);
 
                             cellSizesSet = true;
                         }
@@ -1147,8 +1149,7 @@ class FileTableModel extends AbstractTableModel {
     private File[] files;
     private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
     private String[] columns = {
-        "Icon", "File", "Path/name", "Size", "Last Modified", "R", "W", "E", "D", "F",
-    };
+        "Icon", "File", "Path/name", "Size", "Last Modified"};
 
     FileTableModel() {
         this(new File[0]);
@@ -1172,13 +1173,13 @@ class FileTableModel extends AbstractTableModel {
             case 4:
                 return file.lastModified();
             case 5:
-                return file.canRead();
+               // return file.canRead(); //이하 4개는 우상단 테이블에서 RWEDF관련
             case 6:
-                return file.canWrite();
+                //return file.canWrite();
             case 7:
-                return file.canExecute();
+               // return file.canExecute();
             case 8:
-                return file.isDirectory();
+               // return file.isDirectory();
             case 9:
                 return file.isFile();
             default:
