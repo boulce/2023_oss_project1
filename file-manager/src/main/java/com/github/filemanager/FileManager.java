@@ -1053,13 +1053,16 @@ public class FileManager {
                     @Override
                     public Void doInBackground() throws InterruptedException, GitAPIException {
                         while(true){
-                            System.out.println(currentPath.getName());
+                           // System.out.println(currentPath.getName());
 
 
 
 
                             if(isGitRepository(currentPath)) {
+
                                 Status status = git.status().call();
+
+                                System.out.println("call setgit");
                                 fileTableModel.setGit(status,currentPath);
 /*
  getValueAt으로 옮김,
@@ -1086,7 +1089,7 @@ public class FileManager {
                                 System.out.println("Modified:" + modifiedSet);
                                 System.out.println("Staged:" + stagedSet);
 */
-
+                                System.out.println("repaint ");
                                 table.repaint(); //getValueat() 호출되면서 아이콘 변경 반영
                                 //if git current path
                                 // 외부 브라우저에서 파일들 변할때 즉각적 반영 필요하면 사용
@@ -1173,16 +1176,13 @@ public class FileManager {
 /** A TableModel to hold File[]. */
 class FileTableModel extends AbstractTableModel {
 
-    private Status status;
+    private Status tablemodel_status;
     private File tablemodel_currentpath;
     private File[] files;
     private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
     private String[] columns = {
         "Icon", "File", "Path/name", "Size", "Last Modified"};
 
-    private String[] git_settings={
-            "Untracked", "Modified", "Staged"
-    };
 
     FileTableModel() {
         this(new File[0]);
@@ -1200,11 +1200,11 @@ class FileTableModel extends AbstractTableModel {
         File file = files[row];
         switch (column) {
             case 0:
-                if(isGitRepository(tablemodel_currentpath)) {
+                if(isGitRepository(tablemodel_currentpath)) { //checkFileStatusThreading 에서 setgit으로 넘겨받은 status, currentpath를 바탕으로 현재 경로가 git 폴더인지 파악
 
-                    Set<String> untrackedSet = status.getUntracked();
-                    Set<String> modifiedSet = status.getModified();
-                    Set<String> stagedSet = status.getAdded();
+                    Set<String> untrackedSet = tablemodel_status.getUntracked();
+                    Set<String> modifiedSet = tablemodel_status.getModified();
+                    Set<String> stagedSet = tablemodel_status.getAdded();
 
 
 
@@ -1220,7 +1220,7 @@ class FileTableModel extends AbstractTableModel {
 
                             ImageIcon icon = new ImageIcon("opensourceIcon/untracked.png"); //git 상태 아이콘 준비
 
-                            return createOverlayedImageIcon(imageicon_file,icon);
+                            return createOverlayedImageIcon(imageicon_file,icon); //깃 상태 반영된 파일 아이콘 반환
 
                         } else if (modifiedSet.contains(filename)) {
                             Icon icon_file=fileSystemView.getSystemIcon(file);
@@ -1259,26 +1259,20 @@ class FileTableModel extends AbstractTableModel {
                         }
                     }
 
-                    /*ImageIcon icon = new ImageIcon("opensourceIcon/staged.png");
-                            Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-                            ImageIcon scaledIcon = new ImageIcon(image);
 
-
-                            return scaledIcon;*/
 
                 }else {
 
                     Icon icon_file=fileSystemView.getSystemIcon(file);
                     Image image_file=((ImageIcon)icon_file).getImage();
-                    //ImageIcon imageicon_file=new ImageIcon(((ImageIcon)icon_file).getImage());
                     Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
                     ImageIcon imageicon_file=new ImageIcon(scaledImage_file);
 
-                    //return createOverlayedImageIcon(imageicon_file,icon);
+
                     return imageicon_file;
 
 
-                    //return fileSystemView.getSystemIcon(file); //non-git인 파일들의 Icon받아오는곳 원래상태
+
                 }
 
 
@@ -1354,10 +1348,10 @@ class FileTableModel extends AbstractTableModel {
     }
 
     public void setGit(Status status,File currentPath) {
-        //System.out.println("start setgit");
-        this.status=status;
+        System.out.println("segGit start");
+        tablemodel_status=status;
         tablemodel_currentpath=currentPath;
-        //System.out.println("here setgit");
+
 
     }
 
