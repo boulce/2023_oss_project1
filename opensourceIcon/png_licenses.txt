@@ -1,0 +1,4 @@
+untracked.png : <a href="https://www.flaticon.com/kr/free-icons/" title="물음표 아이콘">물음표 아이콘  제작자: riajulislam - Flaticon</a>
+unmodified,commited.png : <a href="https://www.flaticon.com/kr/free-icons/" title="진드기 아이콘">진드기 아이콘  제작자: Roundicons - Flaticon</a>
+modified.png : <a href="https://www.flaticon.com/kr/free-icons/" title="느낌표 아이콘">느낌표 아이콘  제작자: Flat Icons - Flaticon</a>
+staged.png : <a href="https://www.flaticon.com/kr/free-icons/-" title="...을 더한 아이콘">...을 더한 아이콘  제작자: Md Tanvirul Haque - Flaticon</a>
