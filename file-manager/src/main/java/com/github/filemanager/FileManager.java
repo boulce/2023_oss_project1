@@ -1046,43 +1046,50 @@ public class FileManager {
     */
 
     // 파일 상태 지속적으로 확인해주는 SwingWorker
-    /*
+
     private void checkFileStatusThreading() {
         SwingWorker<Void, File> worker =
                 new SwingWorker<Void, File>() {
                     @Override
                     public Void doInBackground() throws InterruptedException, GitAPIException {
                         while(true){
-                            if(isGitRepository(currentPath)){
+                            System.out.println(currentPath.getName());
+
+
+
+
+                            if(isGitRepository(currentPath)) {
                                 Status status = git.status().call();
+                                fileTableModel.setGit(status,currentPath);
+/*
+ getValueAt으로 옮김,
                                 Set<String> untrackedSet = status.getUntracked();
                                 Set<String> modifiedSet = status.getModified();
                                 Set<String> stagedSet = status.getAdded();
 
-                                for ( int i = 0; i < table.getRowCount(); i++){
+                                for (int i = 0; i < table.getRowCount(); i++) {
                                     String filename = (String) table.getValueAt(i, 1); // 테이블을 순회하면서 파일 이름들을 살펴본다
-                                    if(untrackedSet.contains(filename)){
+                                    if (untrackedSet.contains(filename)) {
                                         // 각 상태에 맞는 파일 아이콘으로 변경해주면 됨. 영헌이 부분
 
 
-                                    }
-                                    else if(modifiedSet.contains(filename)){
+                                    } else if (modifiedSet.contains(filename)) {
                                         // 각 상태에 맞는 파일 아이콘으로 변경해주면 됨. 영헌이 부분
-                                    }
-                                    else if(stagedSet.contains(filename)){
+                                    } else if (stagedSet.contains(filename)) {
                                         // 각 상태에 맞는 파일 아이콘으로 변경해주면 됨. 영헌이 부분
                                     }
                                 }
+
+
                                 System.out.println(currentPath.getAbsoluteFile());
                                 System.out.println("Untracked:" + untrackedSet);
                                 System.out.println("Modified:" + modifiedSet);
                                 System.out.println("Staged:" + stagedSet);
+*/
 
-
-
-                                table.repaint();
-                            }
-                            // 외부 브라우저에서 파일들 변할때 즉각적 반영 필요하면 사용
+                                table.repaint(); //getValueat() 호출되면서 아이콘 변경 반영
+                                //if git current path
+                                // 외부 브라우저에서 파일들 변할때 즉각적 반영 필요하면 사용
 //                            try {
 //                                boolean directory = currentFile.isDirectory();
 //
@@ -1098,15 +1105,16 @@ public class FileManager {
 //                            } catch (Throwable t) {
 //                                showThrowable(t);
 //                            }
+                            }
                             Thread.sleep(1000);
-                        }
-                    }
+                        } //while문
+                    } // doinbackground
                 };
         worker.execute();
     }
 
 
-     */
+
     public static void main(String[] args) throws IOException, GitAPIException {
 
 /*
@@ -1155,39 +1163,26 @@ public class FileManager {
                         f.setVisible(true);
 
                         fileManager.showRootFile();
-                       // fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
+                        fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
                     }
                 });
     }
 
-    private static ImageIcon createOverlayedImageIcon(ImageIcon baseIcon) {
-        Image baseImage = baseIcon.getImage();
-        Image overlayImage = new ImageIcon("opensourceIcon/untracked.png").getImage();
 
-        int width = baseImage.getWidth(null);
-        int height = baseImage.getHeight(null);
-
-        int overlayWidth = overlayImage.getWidth(null) / 4;
-        int overlayHeight = overlayImage.getHeight(null) / 4;
-
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = bufferedImage.createGraphics();
-        g2d.drawImage(baseImage, 0, 0, null);
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        g2d.drawImage(overlayImage, width - overlayWidth, height - overlayHeight, overlayWidth, overlayHeight, null);
-        g2d.dispose();
-
-        return new ImageIcon(bufferedImage);
-    }
-}
 
 /** A TableModel to hold File[]. */
 class FileTableModel extends AbstractTableModel {
-    public static int count=0;
+
+    private Status status;
+    private File tablemodel_currentpath;
     private File[] files;
     private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
     private String[] columns = {
         "Icon", "File", "Path/name", "Size", "Last Modified"};
+
+    private String[] git_settings={
+            "Untracked", "Modified", "Staged"
+    };
 
     FileTableModel() {
         this(new File[0]);
@@ -1205,20 +1200,91 @@ class FileTableModel extends AbstractTableModel {
         File file = files[row];
         switch (column) {
             case 0:
+                if(isGitRepository(tablemodel_currentpath)) {
+
+                    Set<String> untrackedSet = status.getUntracked();
+                    Set<String> modifiedSet = status.getModified();
+                    Set<String> stagedSet = status.getAdded();
 
 
 
-                return fileSystemView.getSystemIcon(file); //실질적 Icon받아오는곳
+                    for (int i = 0; i < this.getRowCount(); i++) {
+
+                        String filename = file.getName(); // 테이블을 순회하면서 파일 이름들을 살펴본다
+                        if (untrackedSet.contains(filename)) {
+                            Icon icon_file=fileSystemView.getSystemIcon(file);
+                            Image image_file=((ImageIcon)icon_file).getImage();
+
+                            Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                            ImageIcon imageicon_file=new ImageIcon(scaledImage_file); //git파일의 아이콘 준비
+
+                            ImageIcon icon = new ImageIcon("opensourceIcon/untracked.png"); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageicon_file,icon);
+
+                        } else if (modifiedSet.contains(filename)) {
+                            Icon icon_file=fileSystemView.getSystemIcon(file);
+                            Image image_file=((ImageIcon)icon_file).getImage();
+
+                            Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                            ImageIcon imageicon_file=new ImageIcon(scaledImage_file); //git파일의 아이콘 준비
+
+                            ImageIcon icon = new ImageIcon("opensourceIcon/modified.png"); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageicon_file,icon);
+                        } else if (stagedSet.contains(filename)) {
+                            Icon icon_file=fileSystemView.getSystemIcon(file);
+                            Image image_file=((ImageIcon)icon_file).getImage();
+
+                            Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                            ImageIcon imageicon_file=new ImageIcon(scaledImage_file); //git파일의 아이콘 준비
+
+                            ImageIcon icon = new ImageIcon("opensourceIcon/staged.png"); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageicon_file,icon);
+                        } else {
 
 
 
-                /* 테스트 코드, 이걸 하면 우상단 테이블 Icon칼럼이 모두 크기 조정된 staged.png로 바뀐다.
-                ImageIcon icon=new ImageIcon("opensourceIcon/staged.png");
-                Image image=icon.getImage().getScaledInstance(50,50,Image.SCALE_SMOOTH);
-                ImageIcon scaledIcon=new ImageIcon(image);
+                            Icon icon_file=fileSystemView.getSystemIcon(file);
+                            Image image_file=((ImageIcon)icon_file).getImage();
 
-                return scaledIcon;
-*/
+                            Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                            ImageIcon imageicon_file=new ImageIcon(scaledImage_file); //git파일의 아이콘 준비
+
+                            ImageIcon icon = new ImageIcon("opensourceIcon/unmodified,commited.png"); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageicon_file,icon);
+
+                        }
+                    }
+
+                    /*ImageIcon icon = new ImageIcon("opensourceIcon/staged.png");
+                            Image image = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+                            ImageIcon scaledIcon = new ImageIcon(image);
+
+
+                            return scaledIcon;*/
+
+                }else {
+
+                    Icon icon_file=fileSystemView.getSystemIcon(file);
+                    Image image_file=((ImageIcon)icon_file).getImage();
+                    //ImageIcon imageicon_file=new ImageIcon(((ImageIcon)icon_file).getImage());
+                    Image scaledImage_file=image_file.getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                    ImageIcon imageicon_file=new ImageIcon(scaledImage_file);
+
+                    //return createOverlayedImageIcon(imageicon_file,icon);
+                    return imageicon_file;
+
+
+                    //return fileSystemView.getSystemIcon(file); //non-git인 파일들의 Icon받아오는곳 원래상태
+                }
+
+
+
+
+
 
             case 1:
                 return fileSystemView.getSystemDisplayName(file);
@@ -1286,6 +1352,36 @@ class FileTableModel extends AbstractTableModel {
         this.files = files;
         fireTableDataChanged();
     }
+
+    public void setGit(Status status,File currentPath) {
+        //System.out.println("start setgit");
+        this.status=status;
+        tablemodel_currentpath=currentPath;
+        //System.out.println("here setgit");
+
+    }
+
+    private ImageIcon  createOverlayedImageIcon(ImageIcon baseIcon,ImageIcon gitIcon) {
+        Image baseImage = baseIcon.getImage();
+        Image overlayImage = gitIcon.getImage();
+
+        int width = baseImage.getWidth(null);
+        int height = baseImage.getHeight(null);
+
+        int overlayWidth = overlayImage.getWidth(null) / 32;
+        int overlayHeight = overlayImage.getHeight(null) / 32;
+
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.drawImage(baseImage, 0, 0, null);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        g2d.drawImage(overlayImage, width - overlayWidth, height - overlayHeight, overlayWidth, overlayHeight, null);
+        g2d.dispose();
+
+        return new ImageIcon(bufferedImage);
+    }
+}
+
 }
 
 
