@@ -23,14 +23,9 @@ SOFTWARE.
  */
 package com.github.filemanager;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
@@ -46,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.LineIterator;
 import org.eclipse.jgit.api.Git;
@@ -163,7 +159,7 @@ public class FileManager {
             desktop = Desktop.getDesktop();
 
             JPanel detailView = new JPanel(new BorderLayout(3, 3));
-            // fileTableModel = new FileTableModel();
+
 
             table = new JTable(); //table: 우상단 파일 행렬의 swing 구현체
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -909,28 +905,22 @@ public class FileManager {
                     public void run() {
                         if (fileTableModel == null) {
                             fileTableModel = new FileTableModel();
-                            table.setModel(fileTableModel);
+                            table.setModel(fileTableModel); //UI인 JTable을 내부구현하는 fileTableModel 지정
                         }
                         table.getSelectionModel()
                                 .removeListSelectionListener(listSelectionListener);
                         fileTableModel.setFiles(files);
                         table.getSelectionModel().addListSelectionListener(listSelectionListener);
                         if (!cellSizesSet) {
-                            Icon icon = fileSystemView.getSystemIcon(files[0]);
+                             Icon icon = fileSystemView.getSystemIcon(files[0]); //icon을 실제로 설정하기보다는 바로 아랫줄과 함께 file icon을 표현하기 적당한 크기설정에 사용됨.
 
                             // size adjustment to better account for icons
                             table.setRowHeight(icon.getIconHeight() + rowIconPadding);
 
-                            setColumnWidth(0, -1);
+                            setColumnWidth(0, 50);
                             setColumnWidth(3, 60);
                             table.getColumnModel().getColumn(3).setMaxWidth(120);
                             setColumnWidth(4, -1);
-                            //setColumnWidth(5, -1); //우상단 테이블의 RWEDF관련 열 너비 설정
-                           // setColumnWidth(6, -1);
-                           // setColumnWidth(7, -1);
-                          //  setColumnWidth(8, -1);
-                           // setColumnWidth(9, -1);
-
                             cellSizesSet = true;
                         }
                     }
@@ -974,7 +964,7 @@ public class FileManager {
                                     }
                                 }
                             }
-                            setTableData(files);
+                            setTableData(files); //table의 내부 값을 설정
                         }
                         return null;
                     }
@@ -997,11 +987,14 @@ public class FileManager {
     }
 
     /** Update the File details view with the details of this File. */
-    private void setFileDetails(File file) {
+    private void setFileDetails(File file) { //우하단 회색영역의 설정
         currentFile = file;
+
+        
         Icon icon = fileSystemView.getSystemIcon(file);
         fileName.setIcon(icon);
         fileName.setText(fileSystemView.getSystemDisplayName(file));
+           
         path.setText(file.getPath());
         date.setText(new Date(file.lastModified()).toString());
         size.setText(file.length() + " bytes");
@@ -1053,6 +1046,7 @@ public class FileManager {
     */
 
     // 파일 상태 지속적으로 확인해주는 SwingWorker
+    /*
     private void checkFileStatusThreading() {
         SwingWorker<Void, File> worker =
                 new SwingWorker<Void, File>() {
@@ -1069,6 +1063,8 @@ public class FileManager {
                                     String filename = (String) table.getValueAt(i, 1); // 테이블을 순회하면서 파일 이름들을 살펴본다
                                     if(untrackedSet.contains(filename)){
                                         // 각 상태에 맞는 파일 아이콘으로 변경해주면 됨. 영헌이 부분
+
+
                                     }
                                     else if(modifiedSet.contains(filename)){
                                         // 각 상태에 맞는 파일 아이콘으로 변경해주면 됨. 영헌이 부분
@@ -1081,6 +1077,9 @@ public class FileManager {
                                 System.out.println("Untracked:" + untrackedSet);
                                 System.out.println("Modified:" + modifiedSet);
                                 System.out.println("Staged:" + stagedSet);
+
+
+
                                 table.repaint();
                             }
                             // 외부 브라우저에서 파일들 변할때 즉각적 반영 필요하면 사용
@@ -1105,7 +1104,26 @@ public class FileManager {
                 };
         worker.execute();
     }
+
+
+     */
     public static void main(String[] args) throws IOException, GitAPIException {
+
+/*
+        JFrame frame = new JFrame("Overlay test");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JLabel label=new JLabel();
+        label.setIcon(createOverlayedImageIcon(new ImageIcon("opensourceIcon/staged.png")));
+        frame.add(label);
+
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+*/
+
+
+
         SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -1137,15 +1155,35 @@ public class FileManager {
                         f.setVisible(true);
 
                         fileManager.showRootFile();
-                        fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
+                       // fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
                     }
                 });
+    }
+
+    private static ImageIcon createOverlayedImageIcon(ImageIcon baseIcon) {
+        Image baseImage = baseIcon.getImage();
+        Image overlayImage = new ImageIcon("opensourceIcon/untracked.png").getImage();
+
+        int width = baseImage.getWidth(null);
+        int height = baseImage.getHeight(null);
+
+        int overlayWidth = overlayImage.getWidth(null) / 4;
+        int overlayHeight = overlayImage.getHeight(null) / 4;
+
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.drawImage(baseImage, 0, 0, null);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        g2d.drawImage(overlayImage, width - overlayWidth, height - overlayHeight, overlayWidth, overlayHeight, null);
+        g2d.dispose();
+
+        return new ImageIcon(bufferedImage);
     }
 }
 
 /** A TableModel to hold File[]. */
 class FileTableModel extends AbstractTableModel {
-
+    public static int count=0;
     private File[] files;
     private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
     private String[] columns = {
@@ -1159,17 +1197,36 @@ class FileTableModel extends AbstractTableModel {
         this.files = files;
     }
 
+
+
     public Object getValueAt(int row, int column) {
+
+
         File file = files[row];
         switch (column) {
             case 0:
-                return fileSystemView.getSystemIcon(file);
+
+
+
+                return fileSystemView.getSystemIcon(file); //실질적 Icon받아오는곳
+
+
+
+                /* 테스트 코드, 이걸 하면 우상단 테이블 Icon칼럼이 모두 크기 조정된 staged.png로 바뀐다.
+                ImageIcon icon=new ImageIcon("opensourceIcon/staged.png");
+                Image image=icon.getImage().getScaledInstance(50,50,Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon=new ImageIcon(image);
+
+                return scaledIcon;
+*/
+
             case 1:
                 return fileSystemView.getSystemDisplayName(file);
             case 2:
                 return file.getPath();
             case 3:
                 return file.length();
+
             case 4:
                 return file.lastModified();
             case 5:
@@ -1185,8 +1242,11 @@ class FileTableModel extends AbstractTableModel {
             default:
                 System.err.println("Logic Error");
         }
+
+
         return "";
     }
+
 
     public int getColumnCount() {
         return columns.length;
@@ -1205,7 +1265,7 @@ class FileTableModel extends AbstractTableModel {
             case 7:
             case 8:
             case 9:
-                return Boolean.class;
+                //return Boolean.class;
         }
         return String.class;
     }
@@ -1227,6 +1287,12 @@ class FileTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 }
+
+
+
+
+
+
 
 /** A TreeCellRenderer for a File. */
 class FileTreeCellRenderer extends DefaultTreeCellRenderer {
