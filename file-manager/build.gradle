@@ -59,7 +59,14 @@ jar {
     manifest {
         attributes 'Main-Class': 'com.github.filemanager.FileManager'
     }
+
+
+
 }
+
+
+
+
 
 wrapper {
     gradleVersion = '7.6.1'

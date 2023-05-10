@@ -35,7 +35,9 @@ import javax.swing.event.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.*;
 import javax.swing.tree.*;
+
 import org.apache.commons.io.FileUtils;
+
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
@@ -81,36 +83,52 @@ import static com.github.filemanager.GitUtilsForTrack.*;
  */
 
 
-class Test{
+class Test {
     public static boolean flag;
 }
 
 public class FileManager {
 
-    /** Title of the application */
+    /**
+     * Title of the application
+     */
     public static final String APP_TITLE = "FileMan";
-    /** Used to open/edit/print files. */
+    /**
+     * Used to open/edit/print files.
+     */
     private Desktop desktop;
 
-    /** Provides nice icons and names for files. */
+    /**
+     * Provides nice icons and names for files.
+     */
     private FileSystemView fileSystemView;
 
-    /** currently selected File. */
+    /**
+     * currently selected File.
+     */
     private File currentFile;
 
-    /** Main GUI container */
+    /**
+     * Main GUI container
+     */
     private JPanel gui;
 
-    /** File-system tree. Built Lazily */
+    /**
+     * File-system tree. Built Lazily
+     */
     private JTree tree;
 
     private DefaultTreeModel treeModel;
 
-    /** Directory listing */
+    /**
+     * Directory listing
+     */
     private JTable table;
 
     private JProgressBar progressBar;
-    /** Table model for File[]. */
+    /**
+     * Table model for File[].
+     */
     private FileTableModel fileTableModel;
 
     private ListSelectionListener listSelectionListener;
@@ -215,6 +233,7 @@ public class FileManager {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "gitadd_Modified clicked");
+
                 }
             });
             gitresotre_Modified.addActionListener(new ActionListener() {
@@ -269,7 +288,7 @@ public class FileManager {
             });
 
             //우클릭 처리 추가
-            mouseAdapter=
+            mouseAdapter =
                     new MouseAdapter() {
                         @Override
                         public void mousePressed(MouseEvent e) {
@@ -285,7 +304,8 @@ public class FileManager {
                                 String filepath = ((FileTableModel) table.getModel()).getFile(row).getPath();
                                 //JOptionPane.showMessageDialog(null, row + "번째 행" + filepath);
 
-                                if(isGitRepository(new File(filepath))){
+
+                                if (isGitRepository(new File(filepath))) {
                                     //JOptionPane.showMessageDialog(null, "깃으로 관리중입니다.");
                                     File file = getGitRepository(new File(filepath));
                                     //JOptionPane.showMessageDialog(null, file.getPath());
@@ -297,67 +317,94 @@ public class FileManager {
                                         // git status 명령 실행
                                         Status status = git.status().call();
 
-                                        //JOptionPane.showMessageDialog(null, "untracked" + status.getUntracked());
-                                        //JOptionPane.showMessageDialog(null, "Modified" + status.getModified());
-                                        //JOptionPane.showMessageDialog(null, "Added" + status.getAdded());
-                                        //JOptionPane.showMessageDialog(null, "uncommit " + status.hasUncommittedChanges());
-                                        //JOptionPane.showMessageDialog(null, status.getChanged());
-                                        //JOptionPane.showMessageDialog(null, status.getMissing());
-                                        //JOptionPane.showMessageDialog(null, status.getRemoved());
+
 
                                         Set<String> getUntrackedset = status.getUntracked();
                                         Set<String> unTrackted = new HashSet<String>();
                                         Iterator<String> stringIter = getUntrackedset.iterator();
-                                        while(stringIter.hasNext()){
+                                        while (stringIter.hasNext()) {
                                             String str = stringIter.next();
-                                            unTrackted.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            unTrackted.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
                                             //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
                                         }
 
                                         Set<String> getModifiedset = status.getModified();
                                         Set<String> Modified = new HashSet<String>();
                                         stringIter = getModifiedset.iterator();
-                                        while(stringIter.hasNext()){
+                                        while (stringIter.hasNext()) {
                                             String str = stringIter.next();
-                                            Modified.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            Modified.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
                                             //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
                                         }
 
-                                        Set<String> getAddedset = status.getAdded();
+                                        Set<String> getAddedset = status.getAdded(); //파일을 새로 만들고 add한것
                                         Set<String> Added = new HashSet<String>();
                                         stringIter = getAddedset.iterator();
-                                        while(stringIter.hasNext()){
+                                        while (stringIter.hasNext()) {
                                             String str = stringIter.next();
-                                            Added.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/','\\'))); // 1 2 3
+                                            Added.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
                                             //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
                                         }
+
+                                        Set<String> getChangedset = status.getChanged(); //changed 있는 파일을 변경하고 git add한것.
+                                        Set<String> Changed = new HashSet<String>();
+                                        stringIter = getChangedset.iterator();
+                                        while (stringIter.hasNext()) {
+                                            String str = stringIter.next();
+                                            Changed.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                        }
+                                        Set<String> getRemovedset = status.getRemoved(); //unmodified=commited를 git rm한 것
+                                        Set<String> Removed = new HashSet<String>();
+                                        stringIter = getRemovedset.iterator();
+                                        while (stringIter.hasNext()) {
+                                            String str = stringIter.next();
+                                            Removed.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                        }
+                                        Set<String> getMissingset = status.getMissing(); //파일을 rm 한 것.
+                                        Set<String> Missing = new HashSet<String>();
+                                        stringIter = getMissingset.iterator();
+                                        while (stringIter.hasNext()) {
+                                            String str = stringIter.next();
+                                            Missing.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\')); // 1 2 3
+                                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                                        }
+
+                                        Set<String> getUntrackedFolderset=status.getUntrackedFolders(); //untracked인 폴더
+                                        Set<String> UntrackedFolders=new HashSet<String>();
+                                        stringIter=getUntrackedFolderset.iterator();
+                                        while(stringIter.hasNext()) {
+                                            String str=stringIter.next();
+                                            UntrackedFolders.add(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\'));
+                                        }
+
+
                                         //JOptionPane.showMessageDialog(null, filepath);
-                                        if(unTrackted.contains(filepath)){// untracked 파일일 경우
+                                        if (unTrackted.contains(filepath)||UntrackedFolders.contains(filepath)) {// untracked 파일일 경우
                                             //JOptionPane.showMessageDialog(null, "untracked");
                                             popupMenuUntracked.show(e.getComponent(), e.getX(), e.getY());
-                                        }
-                                        else if(Modified.contains(filepath)){//Modified 파일인 경우
+                                        } else if (Modified.contains(filepath)) {//Modified 파일인 경우
                                             //JOptionPane.showMessageDialog(null, "Modified");
                                             popupMenuModified.show(e.getComponent(), e.getX(), e.getY());
-                                        }
-                                        else if(Added.contains(filepath)){//Staged 파일인 경우
+                                        } else if (Added.contains(filepath)) {//Staged 파일인 경우
                                             //JOptionPane.showMessageDialog(null, "Staged");
                                             popupMenuStaged.show(e.getComponent(), e.getX(), e.getY());
-                                        }
-                                        else{ // commited 파일일 경우 == untracked modified added 모두 아닐 경우
+                                        } else if (Changed.contains(filepath)) {
+
+                                        }else { // commited 파일일 경우 == untracked modified added 모두 아닐 경우
                                             //JOptionPane.showMessageDialog(null, "Commited");
                                             popupMenuCommited.show(e.getComponent(), e.getX(), e.getY());
                                         }
-
 
 
                                     } catch (IOException ex) {
                                         JOptionPane.showMessageDialog(null, "오류1");
 
                                     } catch (GitAPIException ex) {
-                                        JOptionPane.showMessageDialog(null, "오류2");                                }
-                                }
-                                else{
+                                        JOptionPane.showMessageDialog(null, "오류2");
+                                    }
+                                } else {
                                     JOptionPane.showMessageDialog(null, "깃으로 관리 중이지 않습니다.");
                                 }
                             }
@@ -375,25 +422,55 @@ public class FileManager {
                         public void valueChanged(TreeSelectionEvent tse) {
                             DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
-                            showChildren(node);
                             setFileDetails((File) node.getUserObject());
-
+//
                             currentPath = (File) node.getUserObject();
                             // 특정 디렉토리를 누를 때마다 그 선택된 디렉토리 정보를 가져온다
                             File selected_file = (File) node.getUserObject();
-                            if(GitUtilsForTrack.isGitRepository(selected_file)){ // 만약 git에 의해 관리되는 저장소라면
-                                gitinit.setEnabled(false); // git init과
+                            if (GitUtilsForTrack.isGitRepository(selected_file)) { // 만약 git에 의해 관리되는 저장소라면
+                                gitinit .setEnabled(false); // git init과
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
-                            }
-                            else{ // git에 의해 관리되지 않는 저장소라면
+                            } else { // git에 의해 관리되지 않는 저장소라면
                                 gitinit.setEnabled(true); // git init 과
                                 gitcommit.setEnabled(false); // git commit 버튼을 활성화한다.
                             }
+
+                            //////////// 영헌이한테 보여주기
+                            if (isGitRepository(currentPath)) {
+                               // System.out.println(currentPath.getAbsolutePath());
+                                Status status = null;
+                                try {
+                                    status = git.status().call();
+                                } catch (GitAPIException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                               // System.out.println(status.getModified());
+                              //  System.out.println(status.getChanged());
+                              //  System.out.println(status.getAdded());
+                              //  System.out.println(status.getUntracked());
+
+                                fileTableModel.setGit(status, currentPath);
+                                //table.repaint();
+                            } else {
+                                //fileTableModel.setGit(null, currentPath);
+
+
+                                try {
+
+                                    fileTableModel.setPath(currentPath);
+
+                                } catch (Exception e) {
+                                    System.err.println(e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                            showChildren(node);
                         }
                     };
 
@@ -582,16 +659,30 @@ public class FileManager {
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                           /* File directory = new File(".");
-                            if(isGitRepository(directory)){//(1) 현재 폴더가 git으로 관리되는 경우
-                                //버튼 누르면 = gitInit();
-                            }
-                            else{//(2) 현재 폴더가 git으로 관리되고 있지 않은 경우
-                                //버튼 안보임
+                            try {
+                                gitInit();
+                                gitinit .setEnabled(false); // git init과
+                                gitcommit.setEnabled(true); // git commit 버튼을 disable하고
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
                             }
 
+                            Status status= null;
+                            try {
+                                status = git.status().call();
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            try {
+                                fileTableModel.setGit(status,currentPath);
+                            } catch (Exception er) {
 
-                            */
+                            }
+
+                            tableRepaint();
+
+
+
                         }
                     }
             );
@@ -696,7 +787,7 @@ public class FileManager {
 
                         // delete the current node..
                         TreePath currentPath = findTreePath(currentFile);
-                        System.out.println(currentPath);
+                        // System.out.println(currentPath);
                         DefaultMutableTreeNode currentNode =
                                 (DefaultMutableTreeNode) currentPath.getLastPathComponent();
 
@@ -718,14 +809,17 @@ public class FileManager {
     }
 
     //1. Git Init 함수 구현
-    private void gitInit() {
+    private void gitInit() throws GitAPIException {
         //git init 실행하는 코드 작성
+        git=Git.init()
+                .setDirectory(currentPath)
+                .call();
 
     }
 
     //2. Git commit 구현
     private void gitCommit() throws IOException, GitAPIException {
-        if(git.status().call().getAdded().size() > 0) { //staged인 파일이 1개 이상 존재하는 경우
+        if (git.status().call().getAdded().size() > 0) { //staged인 파일이 1개 이상 존재하는 경우
             //표에 나타내기
             JPanel panel = new JPanel(new BorderLayout());
             JTextField textField = new JTextField();
@@ -739,7 +833,7 @@ public class FileManager {
 
             // 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
             DefaultTableModel model = (DefaultTableModel) table.getModel();
-            for(String stagedFile : stagedSet){
+            for (String stagedFile : stagedSet) {
                 File stagedFILE = new File(stagedFile);
 
                 Object[] rowData = {null, stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
@@ -771,8 +865,7 @@ public class FileManager {
                     JOptionPane.showMessageDialog(null, "Commit cancelled", "알림", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-        }
-        else{
+        } else {
             String msg = "There are no staged files";
             showErrorMessage(msg, "Commit Error");
         }
@@ -903,7 +996,9 @@ public class FileManager {
         gui.repaint();
     }
 
-    /** Update the table on the EDT */
+    /**
+     * Update the table on the EDT
+     */
     private void setTableData(final File[] files) {
         SwingUtilities.invokeLater(
                 new Runnable() {
@@ -915,7 +1010,7 @@ public class FileManager {
                         table.getSelectionModel()
                                 .removeListSelectionListener(listSelectionListener);
                         fileTableModel.setFiles(files);
-                        table.getSelectionModel().addListSelectionListener(listSelectionListener);
+                        //table.getSelectionModel().addListSelectionListener(listSelectionListener);
                         if (!cellSizesSet) {
                             Icon icon = fileSystemView.getSystemIcon(files[0]); //icon을 실제로 설정하기보다는 바로 아랫줄과 함께 file icon을 표현하기 적당한 크기설정에 사용됨.
 
@@ -952,8 +1047,8 @@ public class FileManager {
      */
     private void showChildren(final DefaultMutableTreeNode node) {
         tree.setEnabled(false);
-        progressBar.setVisible(true);
-        progressBar.setIndeterminate(true);
+        progressBar.setVisible(false);
+        progressBar.setIndeterminate(false);
 
         SwingWorker<Void, File> worker =
                 new SwingWorker<Void, File>() {
@@ -991,7 +1086,9 @@ public class FileManager {
         worker.execute();
     }
 
-    /** Update the File details view with the details of this File. */
+    /**
+     * Update the File details view with the details of this File.
+     */
     private void setFileDetails(File file) { //우하단 회색영역의 설정
         currentFile = file;
 
@@ -1051,51 +1148,24 @@ public class FileManager {
     */
 
     // 파일 상태 지속적으로 확인해주는 SwingWorker
-
-    private void checkFileStatusThreading() {
+    private void tableRepaint() {
         SwingWorker<Void, File> worker =
                 new SwingWorker<Void, File>() {
                     @Override
                     public Void doInBackground() throws InterruptedException, GitAPIException {
-                        while(true){
-                            // System.out.println(currentPath.getName());
-
-                            if(isGitRepository(currentPath)) {
-
-                                Status status = git.status().call();
-
-                                System.out.println("call setgit");
-                                fileTableModel.setGit(status,currentPath);
-
-                            }
-                            else{
-
-                                //fileTableModel.setGit(null,currentPath);
-                                String rootPath = System.getProperty("user.dir");
-                                System.out.println(rootPath+"5656");
-                                System.out.println("repaint ");
-
-                                System.out.println(currentPath.getPath());
-
-                                if(currentPath.getAbsolutePath() !=currentPath.getPath() )
-                                    fileTableModel.setPath(currentPath);
-
-                            }
-
-                            table.repaint();
-                            Thread.sleep(1000);
-                        } //while문
+                            fileTableModel.fireTableDataChanged();
+                            //table.repaint();
+                        return null;
                     } // doinbackground
                 };
         worker.execute();
     }
 
 
-
     public static void main(String[] args) throws IOException, GitAPIException {
 
-
-
+        String classpath = System.getProperty("java.class.path");
+       // System.out.println(classpath);
 
         SwingUtilities.invokeLater(
                 new Runnable() {
@@ -1106,6 +1176,7 @@ public class FileManager {
                             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                         } catch (Exception weTried) {
                         }
+
                         JFrame f = new JFrame(APP_TITLE);
                         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -1128,14 +1199,15 @@ public class FileManager {
                         f.setVisible(true);
 
                         fileManager.showRootFile();
-                        fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
+                        //fileManager.checkFileStatusThreading(); // 파일 상태 실시간 체크 SwingWorker
                     }
                 });
     }
 
 
-
-    /** A TableModel to hold File[]. */
+    /**
+     * A TableModel to hold File[].
+     */
     class FileTableModel extends AbstractTableModel {
 
         private Status tablemodel_status;
@@ -1154,7 +1226,7 @@ public class FileManager {
             this.files = files;
         }
 
-
+//수정하기 전에에에에에
 
         public Object getValueAt(int row, int column) {
 
@@ -1162,19 +1234,120 @@ public class FileManager {
             switch (column) {
                 case 0:
                     //ystem.out.println("!!!!!!!!");
-                    if(isGitRepository(tablemodel_currentpath)) { //checkFileStatusThreading 에서 setgit으로 넘겨받은 status, currentpath를 바탕으로 현재 경로가 git 폴더인지 파악
+                    if (isGitRepository(tablemodel_currentpath)) { //checkFileStatusThreading 에서 setgit으로 넘겨받은 status, currentpath를 바탕으로 현재 경로가 git 폴더인지 파악
+
+                        String filepath = file.getAbsolutePath();
+
+
 
 
                         Set<String> untrackedSet = tablemodel_status.getUntracked();
+                        Set<String> unTrackted = new HashSet<String>();
+                        Iterator<String> stringIter = untrackedSet.iterator();
+                        while (stringIter.hasNext()) {
+                            String str = stringIter.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            unTrackted.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/', '\\'))); // 1 2 3
+                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                        }
+
                         Set<String> modifiedSet = tablemodel_status.getModified();
-                        Set<String> stagedSet = tablemodel_status.getAdded();
+                        Set<String> modified = new HashSet<String>();
+                        Iterator<String> stringIter1 = modifiedSet.iterator();
+                        while (stringIter1.hasNext()) {
+                            String str = stringIter1.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            modified.add(path); // 1 2 3
+                            //modified.add(getAbsolutePath(file.getParentFile() + "\\" + str.replace('/', '\\'))); // 1 2 3
+                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                        }
 
-                        System.out.println(tablemodel_currentpath.getAbsolutePath());
+                        Set<String> stagedSet = tablemodel_status.getChanged();
+                        Set<String> staged = new HashSet<String>();
+                        Iterator<String> stringIter2 = stagedSet.iterator();
+                        while (stringIter2.hasNext()) {
+                            String str = stringIter2.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            staged.add(path);
+                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                        }
+                        Set<String> addSet = tablemodel_status.getAdded();
+                        Set<String> added = new HashSet<String>();
+                        Iterator<String> stringIter3 = addSet.iterator();
+                        while (stringIter3.hasNext()) {
+                            String str = stringIter3.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            added.add(path);
+                            //JOptionPane.showMessageDialog(null, file.getParentFile() + "\\"+ str.replace('/','\\'));
+                        }
+                        Set<String> removeSet = tablemodel_status.getRemoved();
+                        Set<String> removed = new HashSet<String>();
+                        Iterator<String> stringIter4 = removeSet.iterator();
+                        while (stringIter4.hasNext()) {
+                            String str = stringIter4.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            removed.add(path);
+                        }
 
-                        //for (int i = 0; i < this.getRowCount(); i++) {
+                        Set<String> missingSet = tablemodel_status.getMissing();
+                        Set<String> missing = new HashSet<String>();
+                        Iterator<String> stringIter5 = missingSet.iterator();
+                        while (stringIter5.hasNext()) {
+                            String str = stringIter5.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            missing.add(path);
+                        }
 
-                        String filename = file.getName(); // 테이블을 순회하면서 파일 이름들을 살펴본다
-                        if (untrackedSet.contains(filename)) {
+                        Set<String> untrackedfolderSet=tablemodel_status.getUntrackedFolders();
+                        Set<String> untrackedfolder = new HashSet<String>();
+                        Iterator<String> stringIter6 = untrackedfolderSet.iterator();
+                        while (stringIter6.hasNext()) {
+                            String str = stringIter6.next();
+                            String path = getGitRepository(file).getParentFile().getAbsolutePath() + "\\" +  str.replace('/', '\\');
+                            untrackedfolder.add(path);
+                        }
+
+                        System.out.println("------------------------------------");
+                        System.out.println("unTrackted" + unTrackted);
+                        System.out.println("unTracktedSet" + untrackedSet);
+                        System.out.println("modified" + modified);
+                        System.out.println("modifieddSet" + modifiedSet);
+                        System.out.println("staged" + staged);
+                        System.out.println("added" + added);
+                        System.out.println("removed" + removed);
+                        System.out.println("missing" + missing);
+                        System.out.println("untrackedfolder" + untrackedfolder);
+
+
+
+                        if (unTrackted.contains(filepath)||untrackedfolder.contains(filepath)) {
+
+
+                            Icon icon = fileSystemView.getSystemIcon(file);
+
+                            BufferedImage image = new BufferedImage(
+                                    icon.getIconWidth(),
+                                    icon.getIconHeight(),
+                                    BufferedImage.TYPE_INT_ARGB
+                            );
+                            Graphics g = image.createGraphics();
+
+// paint the Icon to the BufferedImage
+                            icon.paintIcon(null, g, 0, 0);
+                            g.dispose();
+
+// resize the image
+                            Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+// create a new ImageIcon
+                            ImageIcon imageIcon = new ImageIcon(scaledImage);
+
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("untracked.png")); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageIcon, icon_git);
+
+
+                        } else if (modified.contains(filepath)) {
                             Icon icon = fileSystemView.getSystemIcon(file);
                             //System.out.println("non git repo");
                             BufferedImage image = new BufferedImage(
@@ -1194,12 +1367,10 @@ public class FileManager {
 // create a new ImageIcon
                             ImageIcon imageIcon = new ImageIcon(scaledImage);
 
-                            ImageIcon icon_git = new ImageIcon("opensourceIcon/untracked.png"); //git 상태 아이콘 준비
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("modified.png")); //git 상태 아이콘 준비
 
-                            return createOverlayedImageIcon(imageIcon,icon_git);
-
-
-                        } else if (modifiedSet.contains(filename)) {
+                            return createOverlayedImageIcon(imageIcon, icon_git);
+                        } else if (staged.contains(filepath)) {
                             Icon icon = fileSystemView.getSystemIcon(file);
                             //System.out.println("non git repo");
                             BufferedImage image = new BufferedImage(
@@ -1219,10 +1390,12 @@ public class FileManager {
 // create a new ImageIcon
                             ImageIcon imageIcon = new ImageIcon(scaledImage);
 
-                            ImageIcon icon_git = new ImageIcon("opensourceIcon/modified.png"); //git 상태 아이콘 준비
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("staged.png")); //git 상태 아이콘 준비
 
-                            return createOverlayedImageIcon(imageIcon,icon_git);
-                        } else if (stagedSet.contains(filename)) {
+                            return createOverlayedImageIcon(imageIcon, icon_git);
+
+                        } else if (added.contains(filepath)) {
+
                             Icon icon = fileSystemView.getSystemIcon(file);
                             //System.out.println("non git repo");
                             BufferedImage image = new BufferedImage(
@@ -1242,13 +1415,65 @@ public class FileManager {
 // create a new ImageIcon
                             ImageIcon imageIcon = new ImageIcon(scaledImage);
 
-                            ImageIcon icon_git = new ImageIcon("opensourceIcon/staged.png"); //git 상태 아이콘 준비
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("staged.png")); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageIcon, icon_git);
+
+
+                        } else if (removed.contains(filepath)) {
+                            Icon icon = fileSystemView.getSystemIcon(file);
+                            //System.out.println("non git repo");
+                            BufferedImage image = new BufferedImage(
+                                    icon.getIconWidth(),
+                                    icon.getIconHeight(),
+                                    BufferedImage.TYPE_INT_ARGB
+                            );
+                            Graphics g = image.createGraphics();
+
+// paint the Icon to the BufferedImage
+                            icon.paintIcon(null, g, 0, 0);
+                            g.dispose();
+
+// resize the image
+                            Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+// create a new ImageIcon
+                            ImageIcon imageIcon = new ImageIcon(scaledImage);
+
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("removed.png")); //git 상태 아이콘 준비
+
+                            return createOverlayedImageIcon(imageIcon, icon_git);
+
+
+                        } else if (missing.contains(filepath)) {
+                            Icon icon = fileSystemView.getSystemIcon(file);
+                            //System.out.println("non git repo");
+                            BufferedImage image = new BufferedImage(
+                                    icon.getIconWidth(),
+                                    icon.getIconHeight(),
+                                    BufferedImage.TYPE_INT_ARGB
+                            );
+                            Graphics g = image.createGraphics();
+
+// paint the Icon to the BufferedImage
+                            icon.paintIcon(null, g, 0, 0);
+                            g.dispose();
+
+// resize the image
+                            Image scaledImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+
+// create a new ImageIcon
+                            ImageIcon imageIcon = new ImageIcon(scaledImage);
+
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("missing.png")); //git 상태 아이콘 준비
 
                             return createOverlayedImageIcon(imageIcon,icon_git);
 
                         } else {
+
+                            System.out.println(filepath);
                             Icon icon = fileSystemView.getSystemIcon(file);
-                            System.out.println("non git repo");
+                            //System.out.println("non git repo");
                             BufferedImage image = new BufferedImage(
                                     icon.getIconWidth(),
                                     icon.getIconHeight(),
@@ -1266,13 +1491,13 @@ public class FileManager {
 // create a new ImageIcon
                             ImageIcon imageIcon = new ImageIcon(scaledImage);
 
-                            ImageIcon icon_git = new ImageIcon("opensourceIcon/unmodified,commited.png"); //git 상태 아이콘 준비
+                            ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("unmodified,commited.png")); //git 상태 아이콘 준비
 
-                            return createOverlayedImageIcon(imageIcon,icon_git);
+                            return createOverlayedImageIcon(imageIcon, icon_git);
 
                         }
                         //}
-                    }else {
+                    } else {
 
                         Icon icon = fileSystemView.getSystemIcon(file);
                         //System.out.println("non git repo");
@@ -1296,12 +1521,7 @@ public class FileManager {
                         return imageIcon;
 
 
-
                     }
-
-
-
-
 
 
                 case 1:
@@ -1371,17 +1591,17 @@ public class FileManager {
             fireTableDataChanged();
         }
 
-        public void setGit(Status status,File currentPath) {
-            System.out.println("segGit start");
-            tablemodel_status=status;
-            tablemodel_currentpath=currentPath;
+        public void setGit(Status status, File currentPath) {
+
+            tablemodel_status = status;
+            tablemodel_currentpath = currentPath;
         }
 
         public void setPath(File currentPath) {
-            tablemodel_currentpath=currentPath;
+            tablemodel_currentpath = currentPath;
         }
 
-        private ImageIcon  createOverlayedImageIcon(ImageIcon baseIcon,ImageIcon gitIcon) {
+        private ImageIcon createOverlayedImageIcon(ImageIcon baseIcon, ImageIcon gitIcon) {
             Image baseImage = baseIcon.getImage();
             Image overlayImage = gitIcon.getImage();
 
@@ -1394,7 +1614,7 @@ public class FileManager {
             BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = bufferedImage.createGraphics();
             g2d.drawImage(baseImage, 0, 0, null);
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f));
             g2d.drawImage(overlayImage, width - overlayWidth, height - overlayHeight, overlayWidth, overlayHeight, null);
             g2d.dispose();
 
@@ -1405,12 +1625,9 @@ public class FileManager {
 }
 
 
-
-
-
-
-
-/** A TreeCellRenderer for a File. */
+/**
+ * A TreeCellRenderer for a File.
+ */
 class FileTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private FileSystemView fileSystemView;
