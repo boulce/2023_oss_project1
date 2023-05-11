@@ -994,36 +994,72 @@ public class FileManager {
 
     //2. Git commit 구현
     private void gitCommit() throws IOException, GitAPIException {
-        if (git.status().call().getAdded().size() > 0 || git.status().call().getChanged().size()>0) { //added인 파일이 1개 이상 존재하는 경우, 그리고 Changed인 파일이 1개이상 존재하는 경우
+        if (git.status().call().getAdded().size() > 0 || git.status().call().getChanged().size()>0 || git.status().call().getRemoved().size()>0) { //added인 파일이 1개 이상 존재하는 경우, 그리고 Changed인 파일이 1개이상 존재하는 경우
             // 표에 나타내기
             JPanel panel = new JPanel(new BorderLayout());
             JTextField textField = new JTextField();
             JLabel messageLabel = new JLabel(" Please enter your commit message. : \n");
             JPanel bottomPanel = new JPanel(new BorderLayout());
             //빈 테이블에 staged 된 파일 불러오기
-            JTable table = new JTable(new DefaultTableModel(new Object[]{"Icon", "File", "Path/name"}, 0));
+            JTable table = new JTable(new DefaultTableModel(new Object[]{"Status", "File", "Path/name"}, 0){
+                public Class<?> getColumnClass(int column) {
+                    if (column==0){
+                        return ImageIcon.class;
+                    }
+                    else return Object.class;
+                }
+            });
+
+            table.setRowHeight(10+rowIconPadding);//commit 테이블의 행 높이 조정
 
 
-            /*
-            Status status = git.status().call();
-            Set<String> stagedSet = status.getAdded();
-            stagedSet.addAll(status.getChanged()); //Added뿐만 아니라 CHanged도 추가
-*/
+
+            System.out.println(table.getColumnClass(0));
 
             Status status = git.status().call();
             Set<String> stagedSet = new HashSet<>();
             stagedSet.addAll(status.getAdded());
             stagedSet.addAll(status.getChanged());
+            stagedSet.addAll(status.getRemoved());
 
 
-            // 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
+
+
+// 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
             DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+
+
             for (String stagedFile : stagedSet) {
                 File stagedFILE = new File(stagedFile);
 
-                Object[] rowData = {null, stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
-                model.addRow(rowData);
+                if(status.getAdded().contains(stagedFile)||status.getChanged().contains(stagedFile)) { //added, changed는 모두 파일이 추가되거나, 변경된 상태에서 staged된것.
+
+                    ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("staged.png"));
+                    Image image=icon.getImage();
+                    Image newimg=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+
+                    Object[] rowData = {new ImageIcon(newimg), stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                    model.addRow(rowData);
+
+
+                } else { //removed =deleted
+
+                    ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("removed.png"));
+                    Image image=icon.getImage();
+                    Image newimg1=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
+
+                    Object[] rowData = {new ImageIcon(newimg1), stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                    model.addRow(rowData);
+                }
+
+
             }
+
+
+
+
+
 
             panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -1054,6 +1090,9 @@ public class FileManager {
             String msg = "There are no staged files";
             showErrorMessage(msg, "Commit Error");
         }
+        Status status = git.status().call();
+        fileTableModel.setGit(status, currentPath);
+        table.repaint();
     }
 
     private void deleteFile() {
@@ -1491,9 +1530,9 @@ public class FileManager {
                             path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
                             untrackedfolder.add(path);
                         }
-/*
+
                         System.out.println("------------------------------------");
-                        System.out.println("unTrackted" + unTrackted);
+                        System.out.println("unTrackted" + unTracked);
                         System.out.println("unTracktedSet" + untrackedSet);
                         System.out.println("modified" + modified);
                         System.out.println("modifieddSet" + modifiedSet);
@@ -1503,7 +1542,7 @@ public class FileManager {
                         System.out.println("missing" + missing);
                         System.out.println("untrackedfolder" + untrackedfolder);
 
-*/
+
 
                         if (unTracked.contains(filepath) || untrackedfolder.contains(filepath)) {
 
