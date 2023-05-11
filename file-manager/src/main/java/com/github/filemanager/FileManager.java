@@ -408,11 +408,13 @@ public class FileManager {
 
 
             });
+
+
             gitmv.addActionListener(new ActionListener() { //git mv를 이름바꾸는 용도로만 사용
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     //JOptionPane.showMessageDialog(null, "git mv clicked");
-                    String newFilePath=JOptionPane.showInputDialog(null,"insert new file name");
+                    String newFilePath=JOptionPane.showInputDialog(null,"insert new file name add extension");
 
                     if(newFilePath !=null && !newFilePath.isEmpty()) {
                         try {
@@ -420,12 +422,23 @@ public class FileManager {
                             String temp = currentPopupPath.replace(gitpath + "\\", "").replace("\\", "/");
                             String newFilePathTemp=newFilePath.replace("\\","/");
 
+                            File oldFile=new File(gitpath,temp);
+                            File newFile=new File(gitpath,newFilePathTemp);
+                            if (!oldFile.renameTo(newFile)) {
+                                JOptionPane.showMessageDialog(null, "Could not rename file");
+                                return;
+                            }
+
+
                             git.add().addFilepattern(newFilePathTemp).call();
+                            //System.out.println("temp: "+temp);
+                            //System.out.println("newFilePathTemp: "+ newFilePathTemp);
                             git.rm().addFilepattern(temp).call();
 
 
                             Status status = git.status().call();
-                            fileTableModel.setGit(status, currentPath);
+                           // System.out.println(status.getRemoved()); //name.txt에서 name1.txt로 바꾼 경우 getRemoved에 name.txt가 남아 filemanager상에 남는다. 그래서 변경전 이름의 아이콘이 removed로 표시된다.
+                            fileTableModel.setGit(status, currentPath); //바로위 만 빼면 git bash상에서도 git mv와 똑같이 구현된다. ui구현의 차이
                             table.repaint();
 
                         } catch (GitAPIException ex) {
@@ -437,6 +450,13 @@ public class FileManager {
             });
 
 
+
+
+
+
+
+
+/*
             //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
             JPopupMenu popupMenuRemoved = new JPopupMenu();
             JMenuItem gitremoved= new JMenuItem("git rm for removed");
@@ -463,7 +483,7 @@ public class FileManager {
 
             });
 
-
+*/
 
 
 
@@ -970,8 +990,8 @@ public class FileManager {
 
     //2. Git commit 구현
     private void gitCommit() throws IOException, GitAPIException {
-        if (git.status().call().getAdded().size() > 0) { //staged인 파일이 1개 이상 존재하는 경우
-            //표에 나타내기
+        if (git.status().call().getAdded().size() > 0 || git.status().call().getChanged().size()>0) { //added인 파일이 1개 이상 존재하는 경우, 그리고 Changed인 파일이 1개이상 존재하는 경우
+            // 표에 나타내기
             JPanel panel = new JPanel(new BorderLayout());
             JTextField textField = new JTextField();
             JLabel messageLabel = new JLabel(" Please enter your commit message. : \n");
@@ -979,8 +999,18 @@ public class FileManager {
             //빈 테이블에 staged 된 파일 불러오기
             JTable table = new JTable(new DefaultTableModel(new Object[]{"Icon", "File", "Path/name"}, 0));
 
+
+            /*
             Status status = git.status().call();
             Set<String> stagedSet = status.getAdded();
+            stagedSet.addAll(status.getChanged()); //Added뿐만 아니라 CHanged도 추가
+*/
+
+            Status status = git.status().call();
+            Set<String> stagedSet = new HashSet<>();
+            stagedSet.addAll(status.getAdded());
+            stagedSet.addAll(status.getChanged());
+
 
             // 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
             DefaultTableModel model = (DefaultTableModel) table.getModel();
