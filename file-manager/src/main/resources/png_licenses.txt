@@ -2,3 +2,5 @@ untracked.png : <a href="https://www.flaticon.com/kr/free-icons/" title="물음�
 unmodified,commited.png : <a href="https://www.flaticon.com/kr/free-icons/" title="진드기 아이콘">진드기 아이콘  제작자: Roundicons - Flaticon</a>
 modified.png : <a href="https://www.flaticon.com/kr/free-icons/" title="느낌표 아이콘">느낌표 아이콘  제작자: Flat Icons - Flaticon</a>
 staged.png : <a href="https://www.flaticon.com/kr/free-icons/-" title="...을 더한 아이콘">...을 더한 아이콘  제작자: Md Tanvirul Haque - Flaticon</a>
+Removed.png: <a href="https://www.flaticon.com/free-icons/recycle-bin" title="recycle bin icons">Recycle bin icons created by Lumi - Flaticon</a>
+missing.png : <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by IYAHICON - Flaticon</a>
