@@ -23,10 +23,6 @@ class GitUtilsForTrack {
         }
         return null;
     }
-    public static String getAbsolutePath(String relativePath) {
-        File file = new File(relativePath);
-        return file.getAbsolutePath();
-    }
 
 
 }
