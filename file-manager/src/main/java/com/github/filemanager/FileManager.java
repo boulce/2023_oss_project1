@@ -1215,9 +1215,29 @@ public class FileManager {
 
     //3. refresh 함수 구현
     private void refresh() throws GitAPIException {
+
+        try {
+            boolean directory = currentFile.isDirectory();
+
+            if (directory) {
+                TreePath currentPath = findTreePath(currentFile);
+               // System.out.println(currentPath);
+                DefaultMutableTreeNode currentNode =
+                        (DefaultMutableTreeNode) currentPath.getLastPathComponent();
+
+                //treeModel.removeNodeFromParent(currentNode);
+                showChildren(currentNode);
+            }
+        } catch (Throwable t) {
+            showThrowable(t);
+        }
+
+
         Status status = git.status().call();
         fileTableModel.setGit(status, currentPath);
+
         table.repaint();
+
     }
 
 
@@ -1250,9 +1270,9 @@ public class FileManager {
         else {
             JOptionPane.showMessageDialog(null, "there are no Modified:deleted");
         }
-        Status status_missed1=git.status().call();
-        fileTableModel.setGit(status_missed1, currentPath);
-        table.repaint();
+
+        refresh();
+
     }
 
 
