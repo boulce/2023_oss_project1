@@ -314,6 +314,8 @@ public class FileManager {
 
                         String temp = currentPopupPath.replace(OsUtils.getAbsolutePathByOs(gitpath + "\\"), "").replace("\\", "/");
 
+
+
                         ResetCommand reset = git.reset();
                         reset.setRef("HEAD");
                         reset.addPath(temp);
@@ -1008,7 +1010,7 @@ public class FileManager {
             stagedSet.addAll(status.getChanged());
             stagedSet.addAll(status.getRemoved());
 
-            String temp=(String)(git.getRepository().getDirectory().getAbsolutePath()).replace("\\.git",""); //하빈이 보여주기, 경로 처리 어떻게 되나?
+            String temp=(String)(OsUtils.getAbsolutePathByOs(git.getRepository().getDirectory().getParent())); //하빈이 보여주기, 경로 처리 어떻게 되나?
             //System.out.println("here is temp : "+temp);
 
 
@@ -1027,7 +1029,8 @@ public class FileManager {
                     Image image=icon.getImage();
                     Image newimg=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
 
-                    Object[] rowData = {new ImageIcon(newimg), stagedFILE.getName(), temp+"\\"+stagedFILE.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+
+                    Object[] rowData = {new ImageIcon(newimg), stagedFILE.getName(), OsUtils.getAbsolutePathByOs(temp+"\\"+stagedFILE.getName())}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
                     model.addRow(rowData);
 
 
@@ -1037,7 +1040,7 @@ public class FileManager {
                     Image image=icon.getImage();
                     Image newimg1=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
 
-                    Object[] rowData = {new ImageIcon(newimg1), stagedFILE.getName(), temp+"\\"+stagedFILE.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                    Object[] rowData = {new ImageIcon(newimg1), stagedFILE.getName(), OsUtils.getAbsolutePathByOs(temp+"\\"+stagedFILE.getName())}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
                     model.addRow(rowData);
                 }
 
@@ -1056,12 +1059,15 @@ public class FileManager {
 //-------------------------이하 지훈이 코드부분 발췌----------------------------------------------------
 
 //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
-            JPopupMenu popupMenuRemoved = new JPopupMenu();
-            JMenuItem gitremoved= new JMenuItem("git restore --staged for removed");
+            JPopupMenu popupMenuRemoved_commit = new JPopupMenu();
+            JMenuItem gitremoved_commit= new JMenuItem("git restore --staged for removed");
 
 
-            table_commit.setComponentPopupMenu(popupMenuRemoved);
-            gitremoved.addActionListener(new ActionListener() {
+            popupMenuRemoved_commit.add(gitremoved_commit);
+            //table_commit.setComponentPopupMenu(popupMenuRemoved_commit);
+
+            popupMenuRemoved_commit.setVisible(true);
+            gitremoved_commit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JOptionPane.showMessageDialog(null, "git restore --staged execute");
@@ -1069,12 +1075,34 @@ public class FileManager {
 
                     Status status = null;
                     try {
+
+
+
+                        String gitpath = git.getRepository().getDirectory().getParent();
+                        String commitPopupPath=currentPopupPath;
+                        String temp=currentPopupPath.replace(OsUtils.getAbsolutePathByOs(gitpath+ "\\"), "").replace("\\", "/");
+
+
+
+
+                        ResetCommand reset = git.reset();
+                        reset.setRef("HEAD");
+                        reset.addPath(temp); //temp에는 파일명이 들어간다.
+                        reset.call();
+
                         status = git.status().call();
+
+
+
+
+
+
                     } catch (GitAPIException ex) {
                         throw new RuntimeException(ex);
                     }
-                    fileTableModel.setGit(status, currentPath);
-                    table.repaint();
+
+                    //fileTableModel.setGit(status, currentPath);
+                   // table_commit.repaint();
                 }
 
 
@@ -1125,8 +1153,8 @@ public class FileManager {
                                         currentPopupPath = filepath;
 
                                         if (Removed.contains(filepath)) {// removed 파일일 경우
-                                            System.out.println("this is removed file");
-                                            popupMenuRemoved.show(e.getComponent(), e.getX(), e.getY());
+
+                                            popupMenuRemoved_commit.show(e.getComponent(), e.getX(), e.getY());
                                         }
 
 
