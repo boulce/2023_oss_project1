@@ -154,13 +154,6 @@ public class FileManager {
     private JLabel date;
     private JLabel size;
 
-    /* 체크박스 기능 주석 처리함
-    private JCheckBox readable;
-    private JCheckBox writable;
-    private JCheckBox executable;
-    private JRadioButton isDirectory;
-    private JRadioButton isFile;
-    */
 
     /* GUI options/containers for new File/Directory creation.  Created lazily. */
     private JPanel newFilePanel;
@@ -735,16 +728,6 @@ public class FileManager {
             fileDetailsValues.add(size);
             fileDetailsLabels.add(new JLabel("Type", JLabel.TRAILING));
 
-            /* 아래쪽 버튼 옆에 있던 체크박스 삭제
-            JPanel flags = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
-            isDirectory = new JRadioButton("Directory");
-            isDirectory.setEnabled(false);
-            flags.add(isDirectory);
-            isFile = new JRadioButton("File");
-            isFile.setEnabled(false);
-            flags.add(isFile);
-            fileDetailsValues.add(flags);
-            */
 
             int count = fileDetailsLabels.getComponentCount();
             for (int ii = 0; ii < count; ii++) {
@@ -1001,45 +984,50 @@ public class FileManager {
             JLabel messageLabel = new JLabel(" Please enter your commit message. : \n");
             JPanel bottomPanel = new JPanel(new BorderLayout());
             //빈 테이블에 staged 된 파일 불러오기
-            JTable table = new JTable(new DefaultTableModel(new Object[]{"Status", "File", "Path/name"}, 0){
+            JTable table_commit = new JTable(new DefaultTableModel(new Object[]{"Status", "File", "Path/name"}, 0){
                 public Class<?> getColumnClass(int column) {
                     if (column==0){
                         return ImageIcon.class;
                     }
                     else return Object.class;
                 }
+
+
             });
 
-            table.setRowHeight(10+rowIconPadding);//commit 테이블의 행 높이 조정
+            table_commit.setRowHeight(10+rowIconPadding);//commit 테이블의 행 높이 조정
 
 
 
-            System.out.println(table.getColumnClass(0));
+            //System.out.println(table.getColumnClass(0));
 
             Status status = git.status().call();
+            //System.out.println("here is git "+git.getRepository().getDirectory()); //here is git C:\Users\yhyh5\Desktop\herbal\.git
             Set<String> stagedSet = new HashSet<>();
             stagedSet.addAll(status.getAdded());
             stagedSet.addAll(status.getChanged());
             stagedSet.addAll(status.getRemoved());
 
+            String temp=(String)(git.getRepository().getDirectory().getAbsolutePath()).replace("\\.git",""); //하빈이 보여주기, 경로 처리 어떻게 되나?
+            //System.out.println("here is temp : "+temp);
 
 
 
 // 각 테이블에 staged 파일 목록 불러와서 추가하는 부분
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            DefaultTableModel model = (DefaultTableModel) table_commit.getModel();
 
 
 
             for (String stagedFile : stagedSet) {
                 File stagedFILE = new File(stagedFile);
-
+               // System.out.println("here is stagedFile  :   " + stagedFile); //stagedFile이 그냥 new.txt 이렇게 나옴, 경로형태로 안나옴
                 if(status.getAdded().contains(stagedFile)||status.getChanged().contains(stagedFile)) { //added, changed는 모두 파일이 추가되거나, 변경된 상태에서 staged된것.
 
                     ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("staged.png"));
                     Image image=icon.getImage();
                     Image newimg=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
 
-                    Object[] rowData = {new ImageIcon(newimg), stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                    Object[] rowData = {new ImageIcon(newimg), stagedFILE.getName(), temp+"\\"+stagedFILE.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
                     model.addRow(rowData);
 
 
@@ -1049,7 +1037,7 @@ public class FileManager {
                     Image image=icon.getImage();
                     Image newimg1=image.getScaledInstance(20,20,Image.SCALE_SMOOTH);
 
-                    Object[] rowData = {new ImageIcon(newimg1), stagedFILE.getName(), stagedFILE.getAbsolutePath()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                    Object[] rowData = {new ImageIcon(newimg1), stagedFILE.getName(), temp+"\\"+stagedFILE.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
                     model.addRow(rowData);
                 }
 
@@ -1058,15 +1046,108 @@ public class FileManager {
 
 
 
-
-
-
-            panel.add(new JScrollPane(table), BorderLayout.CENTER);
+            panel.add(new JScrollPane(table_commit), BorderLayout.CENTER);
 
             bottomPanel.add(messageLabel, BorderLayout.WEST);
             bottomPanel.add(textField, BorderLayout.CENTER);
 
             panel.add(bottomPanel, BorderLayout.SOUTH);
+
+//-------------------------이하 지훈이 코드부분 발췌----------------------------------------------------
+
+//Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
+            JPopupMenu popupMenuRemoved = new JPopupMenu();
+            JMenuItem gitremoved= new JMenuItem("git restore --staged for removed");
+
+
+            table_commit.setComponentPopupMenu(popupMenuRemoved);
+            gitremoved.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JOptionPane.showMessageDialog(null, "git restore --staged execute");
+
+
+                    Status status = null;
+                    try {
+                        status = git.status().call();
+                    } catch (GitAPIException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    fileTableModel.setGit(status, currentPath);
+                    table.repaint();
+                }
+
+
+            });
+
+            mouseAdapter =
+                    new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            if (e.getButton() == MouseEvent.BUTTON3) {//if (e.isPopupTrigger()) {
+                                int row = table_commit.rowAtPoint(e.getPoint());
+                                if (row >= 0 && row < table_commit.getRowCount()) {
+                                    table_commit.setRowSelectionInterval(row, row);
+                                } else {
+                                    table_commit.clearSelection();
+                                }
+
+                                // 선택된 행에 대한 작업 수행
+                                String filepath = new File((String) ((DefaultTableModel) table_commit.getModel()).getValueAt(row,2)).getPath();
+
+
+                                //System.out.println("sd"+filepath);
+                                if (isGitRepository(new File(filepath))) {
+                                //System.out.println(filepath+"here is git repo");
+                                    File file = getGitRepository(new File(filepath));
+
+
+                                    try (Repository repo = Git.open(file).getRepository()) {
+
+                                        Git git = new Git(repo);
+
+                                        // git status 명령 실행
+                                        Status status = git.status().call();
+
+
+                                        Set<String> getRemovedset = status.getRemoved();
+                                        Set<String> Removed = new HashSet<String>();
+                                        Iterator<String> stringIter = getRemovedset.iterator();
+                                        String path;
+                                        while (stringIter.hasNext()) {
+                                            String str = stringIter.next();
+                                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                                            Removed.add(path);
+
+                                        }
+                                       // System.out.println(status.getRemoved());
+
+                                        currentPopupPath = filepath;
+
+                                        if (Removed.contains(filepath)) {// removed 파일일 경우
+                                            System.out.println("this is removed file");
+                                            popupMenuRemoved.show(e.getComponent(), e.getX(), e.getY());
+                                        }
+
+
+                                    } catch (IOException ex) {
+                                        JOptionPane.showMessageDialog(null, "오류1");
+
+                                    } catch (GitAPIException ex) {
+                                        JOptionPane.showMessageDialog(null, "오류2");
+                                    }
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "깃으로 관리 중이지 않습니다.");
+                                }
+                            }
+                        }
+                    };
+            table_commit.addMouseListener(mouseAdapter);
+
+
+
+//--------------------------------지훈이 코드발췌 끝------------------------------------------------
+
             int result = JOptionPane.showConfirmDialog(null, panel, "Commit message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
             // 확인 버튼을 눌렀을 때의 동작
