@@ -142,9 +142,10 @@ public class FileManager {
     private JButton copyFile;
     /* File details. */
 
-    //git init 추가, git commit  추가
+    //git init 추가, git commit  추가, refresh 추가
     private JButton gitinit;
     private JButton gitcommit;
+    private JButton refresh;
 
     private JLabel fileName;
     private JTextField path;
@@ -595,6 +596,7 @@ public class FileManager {
                             if (GitUtilsForTrack.isGitRepository(selected_file)) { // 만약 git에 의해 관리되는 저장소라면
                                 gitinit.setEnabled(false); // git init과
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
+                                refresh.setEnabled(true);
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -603,6 +605,7 @@ public class FileManager {
                             } else { // git에 의해 관리되지 않는 저장소라면
                                 gitinit.setEnabled(true); // git init 과
                                 gitcommit.setEnabled(false); // git commit 버튼을 활성화한다.
+                                refresh.setEnabled(false);
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -834,6 +837,22 @@ public class FileManager {
             );
             toolBar.add(gitcommit);
 
+            // 3. refesh 버튼, 누르면 Modified와 같이 반영이 안된 파일들을 테이블에 반영해준다
+            refresh = new JButton("Refresh Status");
+            refresh.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                refresh();
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+            );
+            toolBar.add(refresh);
+
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
@@ -1018,9 +1037,7 @@ public class FileManager {
                     Status status = null;
                     try {
                         String gitpath = git.getRepository().getDirectory().getParent();
-                        String commitPopupPath=currentPopupPath;
                         String temp=currentPopupPath.replace(OsUtils.getAbsolutePathByOs(gitpath+ "\\"), "").replace("\\", "/");
-                        System.out.println(currentPopupPath);
                         System.out.println(temp);
                         ResetCommand reset = git.reset();
                         reset.setRef("HEAD");
@@ -1032,11 +1049,11 @@ public class FileManager {
                     } catch (GitAPIException ex) {
                         throw new RuntimeException(ex);
                     }
-//
-//                    fileTableModel.setGit(status, currentPath);
-//                    table_commit.repaint();
-//                    table.repaint();
-//                }
+
+                    fileTableModel.setGit(status, currentPath);
+                    table_commit.repaint();
+                    table.repaint();
+                }
 
 
             });
@@ -1176,6 +1193,14 @@ public class FileManager {
         }
         gui.repaint();
     }
+
+    //3. refresh 함수 구현
+    private void refresh() throws GitAPIException {
+        Status status = git.status().call();
+        fileTableModel.setGit(status, currentPath);
+        table.repaint();
+    }
+
 
     private void newFile() {
         if (currentFile == null) {
@@ -1448,10 +1473,15 @@ public class FileManager {
                         Set<String> untrackedSet = tablemodel_status.getUntracked();
                         Set<String> unTracked = new HashSet<String>();
                         Iterator<String> stringIter = untrackedSet.iterator();
-                        String path;
+                        String path = null;
                         while (stringIter.hasNext()) {
                             String str = stringIter.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+                                
+                            }
                             unTracked.add(path); // 1 2 3
                         }
 
@@ -1460,7 +1490,12 @@ public class FileManager {
                         Iterator<String> stringIter1 = modifiedSet.iterator();
                         while (stringIter1.hasNext()) {
                             String str = stringIter1.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             modified.add(path); // 1 2 3
                         }
 
@@ -1469,7 +1504,12 @@ public class FileManager {
                         Iterator<String> stringIter2 = stagedSet.iterator();
                         while (stringIter2.hasNext()) {
                             String str = stringIter2.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             staged.add(path);
                         }
                         Set<String> addSet = tablemodel_status.getAdded();
@@ -1477,7 +1517,12 @@ public class FileManager {
                         Iterator<String> stringIter3 = addSet.iterator();
                         while (stringIter3.hasNext()) {
                             String str = stringIter3.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             added.add(path);
                         }
                         Set<String> removeSet = tablemodel_status.getRemoved();
@@ -1485,7 +1530,12 @@ public class FileManager {
                         Iterator<String> stringIter4 = removeSet.iterator();
                         while (stringIter4.hasNext()) {
                             String str = stringIter4.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             removed.add(path);
                         }
 
@@ -1494,7 +1544,12 @@ public class FileManager {
                         Iterator<String> stringIter5 = missingSet.iterator();
                         while (stringIter5.hasNext()) {
                             String str = stringIter5.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             missing.add(path);
                         }
 
@@ -1503,7 +1558,12 @@ public class FileManager {
                         Iterator<String> stringIter6 = untrackedfolderSet.iterator();
                         while (stringIter6.hasNext()) {
                             String str = stringIter6.next();
-                            path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            try{
+                                path = OsUtils.getAbsolutePathByOs(getGitRepository(file).getParentFile().getAbsolutePath() + "\\" + str.replace('/', '\\'));
+                            }
+                            catch(Exception e){
+
+                            }
                             untrackedfolder.add(path);
                         }
 
