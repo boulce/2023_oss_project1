@@ -1025,9 +1025,6 @@ public class FileManager {
 
 
             popupMenuRemoved_commit.add(gitremoved_commit);
-            //table_commit.setComponentPopupMenu(popupMenuRemoved_commit);
-
-            popupMenuRemoved_commit.setVisible(true);
             gitremoved_commit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
