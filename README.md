@@ -8,7 +8,7 @@ Microsoft Windows 버전 21H2(OS 빌드 19044.2846) Windows 10 Home
 
 file-manager 폴더를 우클릭하여 “Open Folder as IntelliJ IDEA Community Edition Project” 선택
 build.gradle에서 필요패키지 설치하기
-gradle 메뉴에서 filemanager - shadow - shadowJar 더블 클릭하여 build하기
+gradle 메뉴에서 filemanager - tasks - shadow - shadowJar 더블 클릭하여 build하기
 2023_oss_project1\file-manager\build\libs 디렉터리 안에 filemanager-1.1-all.jar이 생성되었을 것입니다. 이를 실행하시면 됩니다.
 
 
