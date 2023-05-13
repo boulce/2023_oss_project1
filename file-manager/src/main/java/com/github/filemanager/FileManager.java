@@ -729,7 +729,7 @@ public class FileManager {
                     });
             toolBar.add(editFile);
 
-            //2. Edit
+            //3. Print
             printFile = new JButton("Print");
             printFile.setMnemonic('p');
             printFile.addActionListener(
