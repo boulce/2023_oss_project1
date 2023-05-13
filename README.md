@@ -1,6 +1,6 @@
 # 2023_oss_project1
 
--윈도우미리 갖추어야 할 환경 (우리팀에서 사용한 버전을 그대로 사용할 것을 추천합니다.)
+-Windows 미리 갖추어야 할 환경 (우리팀에서 사용한 버전을 그대로 사용할 것을 추천합니다.)
 Java(TM) SE Runtime Environment (build 19.0.2+7-44)
 Gradle 8.1.1
 intellij idea community edition 2022.3.2
