@@ -1,6 +1,12 @@
 # 2023_oss_project1
 
+오픈소스 소프트웨어 프로젝트 첫번째 과제로, GUI를 통한 파일 관리 시스템을 만들었습니다.
+파일 매니저 https://github.com/javadev/file-manager 를 이용하였습니다. 
+As the first task of the open source software project, we created a file management system through the GUI.
+We have used File Manager https://github.com/javadev/file-manager .
+
 -Windows 미리 갖추어야 할 환경 (우리팀에서 사용한 버전을 그대로 사용할 것을 추천합니다.)
+
 Java(TM) SE Runtime Environment (build 19.0.2+7-44)
 Gradle 8.1.1
 intellij idea community edition 2022.3.2
