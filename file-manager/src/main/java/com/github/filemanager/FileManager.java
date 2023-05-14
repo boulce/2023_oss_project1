@@ -797,6 +797,8 @@ public class FileManager {
                                 gitInit();
                                 gitinit.setEnabled(false); // git init과
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
+                                refresh.setEnabled(true);
+                                restore_missed.setEnabled(true);
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
