@@ -52,6 +52,12 @@ import org.eclipse.jgit.lib.Repository;
 
 import static com.github.filemanager.GitUtilsForTrack.*;
 
+import static com.github.filemanager.BranchManagement.*;
+import static com.github.filemanager.BranchMerge.*;
+import static com.github.filemanager.GitClone.*;
+import static com.github.filemanager.GitCommitHistory.*;
+
+
 
 /**
  * A basic File Manager. Requires 1.6+ for the Desktop &amp; SwingWorker classes, amongst other
