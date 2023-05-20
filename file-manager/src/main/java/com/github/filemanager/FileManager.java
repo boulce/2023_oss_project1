@@ -88,7 +88,7 @@ import static com.github.filemanager.GitCommitHistory.*;
  */
 
 
-public class FileManager {//asdf
+public class FileManager {//asdfasdf
 
     /**
      * Title of the application
