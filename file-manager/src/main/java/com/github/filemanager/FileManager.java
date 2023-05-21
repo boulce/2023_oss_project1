@@ -50,13 +50,14 @@ import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
+import static com.github.filemanager.CommitHistoryGraph.showCommitHistory_ver2;
 import static com.github.filemanager.GitUtilsForTrack.*;
 
 import static com.github.filemanager.BranchManagement.*;
 import static com.github.filemanager.BranchMerge.*;
 import static com.github.filemanager.GitClone.*;
 import static com.github.filemanager.GitCommitHistory.*;
-
+import static com.github.filemanager.GitUtilsForTrack.isGitRepository;
 
 
 /**
@@ -153,6 +154,8 @@ public class FileManager {//asdfasdf
     private JButton refresh;
 
     private JButton restore_missed;
+
+    private JButton gitCommitHistory;
 
     private JLabel fileName;
     private JTextField path;
@@ -584,6 +587,11 @@ public class FileManager {//asdfasdf
                     };
             table.addMouseListener(mouseAdapter);
 
+
+            ///////////////////////////////////////////////////////////////////////
+
+
+            ///////////////////////////////////////////////////////////////////////
             // the File tree
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
             treeModel = new DefaultTreeModel(root);
@@ -604,6 +612,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                gitCommitHistory.setEnabled(true);
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -614,6 +623,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(false); // git commit 버튼을 활성화한다.
                                 refresh.setEnabled(false);
                                 restore_missed.setEnabled(false);
+                                gitCommitHistory.setEnabled(false);
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -805,6 +815,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                gitCommitHistory.setEnabled(true);
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -881,6 +892,26 @@ public class FileManager {//asdfasdf
 
             );
             toolBar.add(restore_missed);
+
+            ///////////////////////////////////////git history 보여주는 부분
+            gitCommitHistory = new JButton("Git Commit History");
+            gitCommitHistory.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                showCommitHistory(git);
+                                //showCommitHistory_ver2();
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+
+            );
+            toolBar.add(gitCommitHistory);
+
+            ///////////////////////////////////////
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
@@ -1282,6 +1313,8 @@ public class FileManager {//asdfasdf
         refresh();
 
     }
+
+
 
 
     private void newFile() {
