@@ -1,51 +1,19 @@
 package com.github.filemanager;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.nio.channels.FileChannel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.*;
 
-//import org.eclipse.jgit.api.Git;
-//import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevSort;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
-
-import static com.github.filemanager.GitUtilsForTrack.getGitRepository;
-import static com.github.filemanager.GitUtilsForTrack.isGitRepository;
 
 
 class branchAndCommit{
@@ -56,6 +24,19 @@ class branchAndCommit{
         commitname = tempCommit;
     }
 }
+
+class textgraphAndBranchAndCommit{
+    public String textgraph;
+    public String branchname;
+    public RevCommit commitname;
+    public textgraphAndBranchAndCommit(String text, String name, RevCommit tempCommit){
+        textgraph = text;
+        branchname =name;
+        commitname = tempCommit;
+    }
+}
+
+
 public class GitCommitHistory {
     ///////////////////////
 
@@ -92,8 +73,20 @@ public class GitCommitHistory {
                 //"Author: " + commit.getAuthorIdent().getName() + " <" + commit.getAuthorIdent().getEmailAddress() + ">"
             }
 
+            //dfs방식 구현
+            Stack<branchAndCommit> commitStack = new Stack<>();
+            commitStack.push(commits.get(0));
+            while(!commitStack.empty()){
+                branchAndCommit bac = commitStack.pop();
+                System.out.println(bac.commitname.getShortMessage());
+                for(RevCommit node: bac.commitname.getParents()){//부모 노드 호출
+                    //스택에 넣기
+                    commitStack.push(new branchAndCommit(branchName, node));
+                }
+            }
+
+            /*
             // 그래프 출력
-            //RevWalk revWalk = new RevWalk(repository);
             int parentCount = 0;
             //int j=0;
             for (branchAndCommit commit : commits) {
@@ -102,122 +95,57 @@ public class GitCommitHistory {
                 String graph = createGraph(parentCount);
                 System.out.println(graph + "* " + commitId + " " + shortMessage);
                 parentCount = commit.commitname.getParentCount();
-
             }
-            /*
-            // 그래프 출력
-            System.out.println(
-                    "start\n" +
-                            "  Checksum: " + commits.get(0).commitname.getId().getName() +
-                            "  Author: " + commits.get(0).commitname.getAuthorIdent().getName() +
-                            "  message: " + commits.get(0).commitname.getShortMessage());
-            printGraph(commits.get(0), "", git);
-*/
-            //git.close();
-            /*
-            JFrame window = new JFrame("제목 있는 윈도우");
-            window.setTitle("제목이 변경된 윈도우");
-            window.setBounds(800, 100, 400, 200);
-
-            Container container = window.getContentPane();
-            container.setBackground(Color.ORANGE);
-
-            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            window.setVisible(true);
-
-             */
-            ////////////////////////////////////////////////////////////////
-            /*
-            SwingUtilities.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            try {
-                                // Significantly improves the look of the output in
-                                // terms of the file names returned by FileSystemView!
-                                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                            } catch (Exception weTried) {
-                            }
-                            JFrame f = new JFrame(APP_TITLE);
-                            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-                            //FileManager fileManager = new FileManager();
-                            GitCommitHistory fileManager = new GitCommitHistory();
-                            f.setContentPane(fileManager.getGui());
-
-                            try {
-                                //URL urlBig = fileManager.getClass().getResource("fm-icon-32x32.png");
-                                //URL urlSmall = fileManager.getClass().getResource("fm-icon-16x16.png");
-                                ArrayList<Image> images = new ArrayList<Image>();
-                                //images.add(ImageIO.read(urlBig));
-                                //images.add(ImageIO.read(urlSmall));
-                                f.setIconImages(images);
-                            } catch (Exception weTried) {
-                            }
-
-                            f.pack();
-                            f.setLocationByPlatform(true);
-                            f.setMinimumSize(f.getSize());
-                            f.setVisible(true);
-
-                            fileManager.showRootFile();
-                        }
-                    });
-                    */
+            */
 
             /////////////////////////////////////////////////////////
-            SwingUtilities.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            try {
-                                JFrame frame = new JFrame("깃 커밋 히스토리");
-                                //frame.setTitle("깃 커밋 히스토리");
-                                //frame.setBounds(800, 100, 400, 200);
-                                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                                //Container container = frame.getContentPane();
-                                //container.setBackground(Color.ORANGE);
+            JFrame framed = new JFrame("깃 커밋 히스토리");
+            framed.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);//EXIT_ON_CLOSE
+
+            // Create column names
+            String[] columnNames = {"graph path", "name", "short message"};
 
 
-                                // Create column names
-                                String[] columnNames = {"graph path", "name", "short message"};
+            // Create data for the table
+            Object[][] data = new Object[commits.size()][columnNames.length];
+            int i=0;
+            int j=0;
+            for (branchAndCommit commit : commits) {
+                Object[] newRow = {
+                        commit.commitname.getId().getName(),
+                        commit.commitname.getAuthorIdent().getName(),
+                        commit.commitname.getShortMessage()
+                };
+                for(j=0;j<columnNames.length;j++){
+                    data[i][j] = newRow[j];
+                }
+                i++;
+            }
 
 
-                                // Create data for the table
-                                Object[][] data = new Object[commits.size()][columnNames.length];
-                                int i=0;
-                                int j=0;
-                                for (branchAndCommit commit : commits) {
-                                    Object[] newRow = {
-                                            commit.commitname.getId().getName(),
-                                            commit.commitname.getAuthorIdent().getName(),
-                                            commit.commitname.getShortMessage()
-                                    };
-                                    for(j=0;j<columnNames.length;j++){
-                                        data[i][j] = newRow[j];
-                                    }
-                                    i++;
-                                }
+            // Create a JTable
+            JTable table = new JTable(data, columnNames);
 
+            // Add the table to a scroll pane
+            JScrollPane scrollPane = new JScrollPane(table);
+            framed.add(scrollPane);
 
-                                // Create a JTable
-                                JTable table = new JTable(data, columnNames);
+            // Set the size and visibility of the frame
+            framed.setSize(400, 300);
+            framed.setVisible(true);
 
-                                // Add the table to a scroll pane
-                                JScrollPane scrollPane = new JScrollPane(table);
-                                frame.add(scrollPane);
-
-                                // Set the size and visibility of the frame
-                                frame.setSize(400, 300);
-                                frame.setVisible(true);
-                                //
-
-                            } catch (Exception weTried) {
-                            }
-                        }
-                    });
-
+            framed.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    // 상위 JFrame 닫기
+                    framed.dispose();
+                }
+            });
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
         }
+
+
     }
 
     private static String createGraph(int parentCount) {
