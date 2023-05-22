@@ -4,6 +4,11 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.*;
@@ -26,16 +31,19 @@ class branchAndCommit{
 }
 
 class textgraphAndCommit{
-    public String textgraph;
+    public int line;
     public RevCommit commitname;
-    public textgraphAndCommit(String text, RevCommit tempCommit){
-        textgraph = text;
+    public textgraphAndCommit(int inputline, RevCommit tempCommit){
+        line = inputline;
         commitname = tempCommit;
     }
 }
 
 
 public class GitCommitHistory {
+    private ImageIcon[] images;
+    private static JLabel[] labels;
+
     ///////////////////////
 
     public static void showCommitHistory(Git git) throws GitAPIException {
@@ -109,21 +117,62 @@ public class GitCommitHistory {
             }
 
             for(textgraphAndCommit forprint_ : forPrint){
-                System.out.println(forprint_.textgraph + forprint_.commitname.getShortMessage());
+                System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
+            }
+            //////////////
+            JFrame framed = new JFrame("Image Click Example");
+            framed.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);//EXIT_ON_CLOSE
+            framed.setLayout(null);
+
+            //ImageIcon[] images = new ImageIcon[3];
+            JButton[] textFields = new JButton[forPrint.size()];
+
+            //labels = new JLabel[3];
+
+            // 이미지 로드
+            int countfortextFields =0;
+            for(textgraphAndCommit forprint_ : forPrint){
+                textFields[countfortextFields] = new JButton(forprint_.commitname.getShortMessage());
+                countfortextFields++;
             }
 
-            /*
-            // 그래프 출력
-            int parentCount = 0;
-            //int j=0;
-            for (branchAndCommit commit : commits) {
-                String commitId = commit.commitname.getName();
-                String shortMessage = commit.commitname.getShortMessage();
-                String graph = createGraph(parentCount);
-                System.out.println(graph + "* " + commitId + " " + shortMessage);
-                parentCount = commit.commitname.getParentCount();
+//            textFields[0] = new JButton("a");
+  //          textFields[1] = new JButton("image2.png");
+    //        textFields[2] = new JButton("image3.png");
+            //ImageIcon icon_git = new ImageIcon(getClass().getClassLoader().getResource("unmodified,commited.png")); //git 상태 아이콘 준비
+
+            // 이미지 레이블 생성 및 설정
+            for (int i = 0; i < forPrint.size(); i++) {
+                textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150,50);
+                //labels[i] = new JLabel(textFields[i]);
+                //labels[i].setBounds(100, (i + 1) * 30, images[i].getIconWidth(), images[i].getIconHeight());
+
+                final int index = i; // MouseAdapter에서 참조하기 위해 인덱스를 final 변수로 설정
+                textFields[i].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        showInfoWindow(index);
+                    }
+                });
+
+                framed.add(textFields[i]);
             }
-            */
+
+            framed.setSize(500, 400);
+            framed.setVisible(true);
+
+            framed.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    // 상위 JFrame 닫기
+                    framed.dispose();
+                }
+            });
+
+            //////////////
+
+            /*
+
 
             /////////////////////////////////////////////////////////
             JFrame framed = new JFrame("깃 커밋 히스토리");
@@ -134,14 +183,14 @@ public class GitCommitHistory {
 
 
             // Create data for the table
-            Object[][] data = new Object[commits.size()][columnNames.length];
+            Object[][] data = new Object[forPrint.size()][columnNames.length];
             int i=0;
             int j=0;
-            for (branchAndCommit commit : commits) {
+            for (textgraphAndCommit forPrint_ : forPrint) {
                 Object[] newRow = {
-                        commit.commitname.getId().getName(),
-                        commit.commitname.getAuthorIdent().getName(),
-                        commit.commitname.getShortMessage()
+                        forPrint_.line,
+                        forPrint_.commitname.getAuthorIdent().getName(),
+                        forPrint_.commitname.getShortMessage()
                 };
                 for(j=0;j<columnNames.length;j++){
                     data[i][j] = newRow[j];
@@ -168,12 +217,42 @@ public class GitCommitHistory {
                     framed.dispose();
                 }
             });
+
+            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        int selectedRow = table.getSelectedRow();
+                        int selectedColumn = table.getSelectedColumn();
+
+                        // Handle the selection event
+                        System.out.println("Selected: " + data[selectedRow][selectedColumn]);
+                        JOptionPane.showMessageDialog(framed, "information: \n" +
+                                "commit time : " + forPrint.get(selectedRow).commitname.getCommitTime());
+
+                    }
+                }
+            });
+             */
+
         } catch (IOException | GitAPIException e) {
             e.printStackTrace();
         }
 
 
     }
+
+    private static void showInfoWindow(int index) {
+        JFrame infoWindow = new JFrame("Image Info Window");
+        infoWindow.setLayout(new FlowLayout());
+        infoWindow.setSize(300, 200);
+
+        JLabel infoLabel = new JLabel("Selected Image: " + (index + 1));
+        infoWindow.add(infoLabel);
+
+        infoWindow.setVisible(true);
+    }
+
 
     private static String createGraph(int parentCount) {
         StringBuilder graphBuilder = new StringBuilder();
@@ -199,12 +278,15 @@ public class GitCommitHistory {
         //forPrintList.add(new textgraphAndCommit("123",node));
 
         int insertindex = calIndex(forPrintList, node, lineNum);
+        /*
         String tempStr = "";
         for(int i=0;i<lineNum;i++){
             tempStr += "|____";
         }
         tempStr += "*____";
-        forPrintList.add(insertindex, new textgraphAndCommit(tempStr ,node));//해당 줄
+        */
+
+        forPrintList.add(insertindex, new textgraphAndCommit(lineNum ,node));//해당 줄
 /*
         int count=0;
         for(textgraphAndCommit forPrint : forPrintList){
