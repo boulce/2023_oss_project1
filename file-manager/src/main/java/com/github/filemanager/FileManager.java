@@ -895,7 +895,7 @@ public class FileManager {//asdfasdf
 
             // toolBarForBranch에 위치한 버튼들
             // 임시 Branch list 버튼
-            branch_list_btn = new JButton("Branch List");
+            branch_list_btn = new JButton("Merge");
             branch_list_btn.addActionListener(
 
                     new ActionListener() {
