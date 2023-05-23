@@ -155,7 +155,9 @@ public class FileManager {//asdfasdf
     private JButton restore_missed;
 
     private JButton branch_Create_btn; //F1: 브랜치 생성
-
+    private JButton branch_Delete_btn;
+    private JButton branch_Rename_btn;
+    private JButton branch_Checkout_btn;
     private JButton merge_btn; // merge 버튼
 
     private JLabel fileName;
@@ -614,7 +616,7 @@ public class FileManager {//asdfasdf
 
 
                                 branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
-                                //브랜치 이름
+                                //브랜치 delete, rename, checkout은 항상 활성화 된 후, 브랜치 리스트에서 선택 후 진행된다.
                                 merge_btn.setEnabled(true); // branch_list_btn 활성화
 
 
@@ -922,6 +924,42 @@ public class FileManager {//asdfasdf
                     }
             );
 
+            //7. 브랜치 삭제 버튼
+            branch_Delete_btn = new JButton("Branch Delete");
+            branch_Delete_btn.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                        }
+                    }
+            );
+
+            //8. 브랜치 이름 변경 버튼
+            branch_Rename_btn = new JButton("Branch Rename");
+            branch_Rename_btn.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                        }
+                    }
+            );
+
+            //9. 브랜치 체크아웃 버튼
+            branch_Checkout_btn = new JButton("Branch Checkout");
+            branch_Checkout_btn.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                        }
+                    }
+            );
+
             // merge 버튼
             merge_btn = new JButton("Merge");
             merge_btn.addActionListener(
@@ -949,13 +987,16 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            // 브랜치 Delete, Rename, Checkout
 
             toolBarForBranch.add(branch_Create_btn);
+            toolBarForBranch.add(branch_Delete_btn);
+            toolBarForBranch.add(branch_Rename_btn);
+            toolBarForBranch.add(branch_Checkout_btn);
+            toolBarForBranch.addSeparator();
             toolBarForBranch.add(merge_btn);
 
 
-            toolBarForBranch.addSeparator();
+
             //브랜치 이름 글자로 띄우기
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
