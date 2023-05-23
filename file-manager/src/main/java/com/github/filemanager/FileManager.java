@@ -154,6 +154,8 @@ public class FileManager {//asdfasdf
 
     private JButton restore_missed;
 
+    private JButton git_clone; //테스트용 버튼 곽수정
+
     private JLabel fileName;
     private JTextField path;
     private JLabel date;
@@ -434,39 +436,6 @@ public class FileManager {//asdfasdf
 
 
 
-
-
-
-/*
-            //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
-            JPopupMenu popupMenuRemoved = new JPopupMenu();
-            JMenuItem gitremoved= new JMenuItem("git rm for removed");
-
-            popupMenuStaged.add(gitremoved);
-
-            table.setComponentPopupMenu(popupMenuRemoved);
-            gitremoved.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showMessageDialog(null, "git rm'ed file, what should i do");
-
-
-                    Status status = null;
-                    try {
-                        status = git.status().call();
-                    } catch (GitAPIException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    fileTableModel.setGit(status, currentPath);
-                    table.repaint();
-                }
-
-
-            });
-
-*/
-
-
             //우클릭 처리 추가
             mouseAdapter =
                     new MouseAdapter() {
@@ -604,6 +573,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                git_clone.setEnabled(true); //곽수정
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -881,6 +851,33 @@ public class FileManager {//asdfasdf
 
             );
             toolBar.add(restore_missed);
+
+
+
+
+            //5. git clone기능, 테스트용도 곽수정
+
+
+             git_clone = new JButton("git clone");
+             git_clone.addActionListener(
+
+
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                            String inputRepoUrl = JOptionPane.showInputDialog("git repo 주소를 입력하세요");
+                            gitclone(inputRepoUrl, String.valueOf(currentPath),"");
+
+                        }
+                    }
+
+            );
+            toolBar.add(git_clone);
+
+
+
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
@@ -1283,6 +1280,16 @@ public class FileManager {//asdfasdf
 
     }
 
+
+    //5. git clone 테스트용도 곽수정
+
+    private void gitclone(String repoUrl,String localPath, String accessToken)  {
+
+
+        new GitClone(repoUrl,localPath,"");
+
+
+    }
 
     private void newFile() {
         if (currentFile == null) {
