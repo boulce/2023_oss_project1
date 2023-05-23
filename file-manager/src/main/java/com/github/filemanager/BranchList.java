@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BranchList extends JFrame {
-    public BranchList(Git git, int val) throws GitAPIException {
+    public BranchList(Git git, int which_btn) throws GitAPIException {
         super("Branch List");
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
@@ -68,16 +68,16 @@ public class BranchList extends JFrame {
                         // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
 
 
-                        if(val == 0){ // Delete
+                        if(which_btn == 0){ // Delete
 
                         }
-                        else if(val == 1){ // Rename
+                        else if(which_btn == 1){ // Rename
 
                         }
-                        else if(val == 2){ // Checkout
+                        else if(which_btn == 2){ // Checkout
 
                         }
-                        else if(val == 3){ // Merge
+                        else if(which_btn == 3){ // Merge
                             boolean is_successful_merge;
                             try {
                                 is_successful_merge = BranchMerge.branchMerge(git, (String) value);
