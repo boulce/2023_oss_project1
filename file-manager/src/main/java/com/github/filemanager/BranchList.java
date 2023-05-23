@@ -74,5 +74,7 @@ public class BranchList extends JFrame {
         this.add(panel);
 
         System.out.println("Listing local branches:");
+
+
     }
 }
