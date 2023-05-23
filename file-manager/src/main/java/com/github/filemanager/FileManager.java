@@ -50,7 +50,6 @@ import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
-import static com.github.filemanager.CommitHistoryGraph.showCommitHistory_ver2;
 import static com.github.filemanager.GitUtilsForTrack.*;
 
 import static com.github.filemanager.BranchManagement.*;
