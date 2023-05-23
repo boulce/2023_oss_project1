@@ -607,6 +607,8 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+
+                                branch_list_btn.setEnabled(true); // branch_list_btn 활성화
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -617,6 +619,8 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(false); // git commit 버튼을 활성화한다.
                                 refresh.setEnabled(false);
                                 restore_missed.setEnabled(false);
+
+                                branch_list_btn.setEnabled(false); // branch_list_btn 비활성화
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
