@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BranchList extends JFrame {
-    public BranchList(Git git) throws GitAPIException {
+    public BranchList(Git git, int val) throws GitAPIException {
         super("Branch List");
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
@@ -66,17 +66,32 @@ public class BranchList extends JFrame {
                         // 위 값을 각자의 클래스에 전달해서 잘 처리해주는 식으로 구현하기
                         // ex) 해솔이 같은 경우에는 선택한 값 BranchManagement로 가져가서 사용
                         // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
-                        boolean is_successful_merge;
-                        try {
-                            is_successful_merge = BranchMerge.branchMerge(git, (String) value);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        } catch (GitAPIException ex) {
-                            throw new RuntimeException(ex);
+
+
+                        if(val == 0){ // Delete
+
                         }
-                        if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
-                            dispose(); // 창 종료
+                        else if(val == 1){ // Rename
+
                         }
+                        else if(val == 2){ // Checkout
+
+                        }
+                        else if(val == 3){ // Merge
+                            boolean is_successful_merge;
+                            try {
+                                is_successful_merge = BranchMerge.branchMerge(git, (String) value);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
+                                dispose(); // 창 종료
+                            }
+                        }
+
+
                     }
                 }
         );

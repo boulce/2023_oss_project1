@@ -13,7 +13,6 @@ import java.io.IOException;
 
 
 public class BranchMerge {
-
     /*
         branchMerge 함수는 merge가 정상적으로 수행되면 true를 반환하고, 수행안되면 false를 반환한다.
      */

@@ -894,7 +894,6 @@ public class FileManager {//asdfasdf
 
 
             // toolBarForBranch에 위치한 버튼들
-
             // 임시 Branch list 버튼
             branch_list_btn = new JButton("Branch List");
             branch_list_btn.addActionListener(
@@ -904,7 +903,7 @@ public class FileManager {//asdfasdf
                         public void actionPerformed(ActionEvent e) {
                             if(branchList == null){
                                 try {
-                                    branchList = new BranchList(git);
+                                    branchList = new BranchList(git, 3);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
                                 }
@@ -912,7 +911,7 @@ public class FileManager {//asdfasdf
                             else{
                                 branchList.dispose();
                                 try {
-                                    branchList = new BranchList(git);
+                                    branchList = new BranchList(git, 3);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
                                 }
