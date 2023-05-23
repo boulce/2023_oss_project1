@@ -154,6 +154,8 @@ public class FileManager {//asdfasdf
 
     private JButton restore_missed;
 
+    private JButton branch_list_btn; // 브랜치 리스트 버튼
+
     private JLabel fileName;
     private JTextField path;
     private JLabel date;
@@ -171,6 +173,7 @@ public class FileManager {//asdfasdf
     private String currentPopupPath; // 지훈이가 만든 팝업에서 git 내부구현을 위한 변수
 
     private int commitTableRow; //commit table에서 removed를 클릭하면 반환하는 row
+    private BranchList branchList; // branch list 창
 
     public Container getGui() {
         if (gui == null) {
@@ -699,10 +702,13 @@ public class FileManager {//asdfasdf
             }
 
             JToolBar toolBar = new JToolBar();
+            JToolBar toolBarForBranch = new JToolBar(); // Branch 관련 JToolBar
             // mnemonics stop working in a floated toolbar
             toolBar.setFloatable(false);
+            toolBarForBranch.setFloatable(false); // Branch 관련 JToolBar setFlotable 설정
 
             // 아래쪽 버튼 생성
+            // toolBar에 위치한 버튼들
             // 1. Open
             openFile = new JButton("Open");
             openFile.setMnemonic('o');
@@ -882,10 +888,29 @@ public class FileManager {//asdfasdf
             );
             toolBar.add(restore_missed);
 
+
+            // toolBarForBranch에 위치한 버튼들
+
+            // 임시 Branch list 버튼
+            branch_list_btn = new JButton("Branch List");
+            branch_list_btn.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                        }
+                    }
+
+            );
+            toolBarForBranch.add(branch_list_btn);
+
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
             fileView.add(toolBar, BorderLayout.NORTH);
-            fileView.add(fileMainDetails, BorderLayout.CENTER);
+            fileView.add(toolBarForBranch, BorderLayout.CENTER); // Branch 관련 JToolBar 창에 띄우기
+
+
+            fileView.add(fileMainDetails, BorderLayout.SOUTH); // toolBarForBranch를 toolBar 바로 밑에 위치시키기 위해 BorderLayout.SOUTH로 변경함
 
             detailView.add(fileView, BorderLayout.SOUTH);
 
@@ -1229,7 +1254,7 @@ public class FileManager {//asdfasdf
 
             if (directory) {
                 TreePath currentPath = findTreePath(currentFile);
-               // System.out.println(currentPath);
+                // System.out.println(currentPath);
                 DefaultMutableTreeNode currentNode =
                         (DefaultMutableTreeNode) currentPath.getLastPathComponent();
 
