@@ -1,15 +1,12 @@
 package com.github.filemanager;
 
-import org.eclipse.jgit.api.CheckoutCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.MergeCommand;
-import org.eclipse.jgit.api.MergeResult;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 
 import javax.swing.*;
 import java.io.IOException;
-
+import java.util.Iterator;
 
 
 public class BranchMerge {
@@ -38,7 +35,25 @@ public class BranchMerge {
                 return true;
             } else {
                 if (mergeResult.getMergeStatus().equals(MergeResult.MergeStatus.CONFLICTING)){
-                    System.out.println(mergeResult.getConflicts().toString());
+                    String unmerged_paths = "";
+                    Iterator<String> keys = mergeResult.getConflicts().keySet().iterator();
+                    while (keys.hasNext()){
+                        String key = keys.next();
+                        unmerged_paths += key + ", ";
+                    }
+                    unmerged_paths = unmerged_paths.substring(0, unmerged_paths.length()-2); // unmerged_paths의 마지막 ', '를 제거한다
+                    JOptionPane.showMessageDialog(null, "Conflict happened!" + "\nUnmerged Paths: " + unmerged_paths);
+
+                    /*
+                        git merge --abort
+                        It empties the merge state files and then resets index and work directory to the contents of the current HEAD commit.
+                     */
+                    // clear the merge state
+                    git.getRepository().writeMergeCommitMsg(null);
+                    git.getRepository().writeMergeHeads(null);
+
+                    // reset the index and work directory to HEAD
+                    Git.wrap(git.getRepository()).reset().setMode(ResetCommand.ResetType.HARD).call();
                 }
                 else{
                     JOptionPane.showMessageDialog(null, mergeResult.getMergeStatus());
