@@ -63,7 +63,7 @@ public class GitClone {
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("DESKTOP-65EJS6N\\yhyh5", accessToken))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("YoungHoney", accessToken))
                     .call();
         } catch (GitAPIException e) {
             e.printStackTrace();
