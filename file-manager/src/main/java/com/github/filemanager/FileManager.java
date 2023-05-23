@@ -154,7 +154,7 @@ public class FileManager {//asdfasdf
 
     private JButton restore_missed;
 
-    private JButton branch_list_btn; // 브랜치 리스트 버튼
+    private JButton merge_btn; // merge 버튼
 
     private JLabel fileName;
     private JTextField path;
@@ -608,7 +608,7 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
 
-                                branch_list_btn.setEnabled(true); // branch_list_btn 활성화
+                                merge_btn.setEnabled(true); // branch_list_btn 활성화
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -620,7 +620,7 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(false);
                                 restore_missed.setEnabled(false);
 
-                                branch_list_btn.setEnabled(false); // branch_list_btn 비활성화
+                                merge_btn.setEnabled(false); // branch_list_btn 비활성화
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -815,6 +815,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                merge_btn.setEnabled(true);
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -894,9 +895,9 @@ public class FileManager {//asdfasdf
 
 
             // toolBarForBranch에 위치한 버튼들
-            // 임시 Branch list 버튼
-            branch_list_btn = new JButton("Merge");
-            branch_list_btn.addActionListener(
+            // merge 버튼
+            merge_btn = new JButton("Merge");
+            merge_btn.addActionListener(
 
                     new ActionListener() {
                         @Override
@@ -920,7 +921,7 @@ public class FileManager {//asdfasdf
                     }
 
             );
-            toolBarForBranch.add(branch_list_btn);
+            toolBarForBranch.add(merge_btn);
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
