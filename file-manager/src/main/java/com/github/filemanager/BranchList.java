@@ -87,7 +87,7 @@ public class BranchList extends JFrame {
                                 throw new RuntimeException(ex);
                             }
                             if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
-                                dispose(); // 창 종료
+
                             }
                         }
 
