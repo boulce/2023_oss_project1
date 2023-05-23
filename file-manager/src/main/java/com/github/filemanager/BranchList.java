@@ -9,6 +9,8 @@ import org.eclipse.jgit.lib.Ref;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +49,28 @@ public class BranchList extends JFrame {
         //this.add(scrollpane , BorderLayout.CENTER);
         panel.add(scrollpane);
 
-        panel.setPreferredSize(new Dimension(100, 100)); // panel 크기 조절
+        JButton select_btn = new JButton("select");
+        panel.add(select_btn);
+
+        select_btn.addActionListener( // select btn 눌렀을 시에 이벤트
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int row = branch_list_table.getSelectedRow();
+                        int col = branch_list_table.getSelectedColumn();
+                        Object value = branch_list_table.getValueAt(row, col);
+
+                        System.out.println("selected branch:" + value); // 버튼 누르면 선택한 값 출력
+
+                        // 위 값을 각자의 클래스에 전달해서 잘 처리해주는 식으로 구현하기
+                        // ex) 해솔이 같은 경우에는 선택한 값 BranchManagement로 가져가서 사용
+                        // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
+
+                        dispose(); // 창 종료
+                    }
+                }
+        );
+
         this.add(panel);
 
         System.out.println("Listing local branches:");
