@@ -23,6 +23,71 @@ import java.util.Date;
 import java.util.List;
 
 public class trash {
+    //////////////
+
+            /*
+
+
+            /////////////////////////////////////////////////////////
+            JFrame framed = new JFrame("깃 커밋 히스토리");
+            framed.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);//EXIT_ON_CLOSE
+
+            // Create column names
+            String[] columnNames = {"graph path", "name", "short message"};
+
+
+            // Create data for the table
+            Object[][] data = new Object[forPrint.size()][columnNames.length];
+            int i=0;
+            int j=0;
+            for (textgraphAndCommit forPrint_ : forPrint) {
+                Object[] newRow = {
+                        forPrint_.line,
+                        forPrint_.commitname.getAuthorIdent().getName(),
+                        forPrint_.commitname.getShortMessage()
+                };
+                for(j=0;j<columnNames.length;j++){
+                    data[i][j] = newRow[j];
+                }
+                i++;
+            }
+
+
+            // Create a JTable
+            JTable table = new JTable(data, columnNames);
+
+            // Add the table to a scroll pane
+            JScrollPane scrollPane = new JScrollPane(table);
+            framed.add(scrollPane);
+
+            // Set the size and visibility of the frame
+            framed.setSize(400, 300);
+            framed.setVisible(true);
+
+            framed.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    // 상위 JFrame 닫기
+                    framed.dispose();
+                }
+            });
+
+            table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        int selectedRow = table.getSelectedRow();
+                        int selectedColumn = table.getSelectedColumn();
+
+                        // Handle the selection event
+                        System.out.println("Selected: " + data[selectedRow][selectedColumn]);
+                        JOptionPane.showMessageDialog(framed, "information: \n" +
+                                "commit time : " + forPrint.get(selectedRow).commitname.getCommitTime());
+
+                    }
+                }
+            });
+             */
     /*
         private static void printGraph(branchAndCommit commit, String indent, Git git) throws IOException {
         try (RevWalk revWalk = new RevWalk(git.getRepository())) {
