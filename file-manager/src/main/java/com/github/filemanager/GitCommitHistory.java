@@ -41,6 +41,10 @@ class textgraphAndCommit{
 
 
 public class GitCommitHistory {
+    static int count_labelssSize=0;
+    static int numOfDownClik=0;
+    //int count_labelssSize=0;
+
     public static void showCommitHistory(Git git) throws GitAPIException {
 
         try {
@@ -144,11 +148,24 @@ public class GitCommitHistory {
                 framed.add(textFields[i]);
             }
 
+
+            //JButton[] textFields = new JButton[forPrint.size()];
+            /*
+            JLabel[][] labelss = new JLabel[forPrint.size()][20];
+            for(int i=0;i<forPrint.size();i++){
+                for(int j=0;j<20;j++){
+                    labelss[i][j] = new JLabel(new ImageIcon("image1.png"));
+                }
+            }
+            */
+            JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * 20];
+
+            count_labelssSize=0;
             //선 긋기. //이미지로 구현
             for(int i=0;i<forPrint.size();i++){
                 for(int j=i;j<forPrint.size();j++){
                     if(AisParentOfB(forPrint.get(j),forPrint.get(i))){
-                        System.out.println(j + "는 부모다 " + i + "의");
+                        //System.out.println(j + "는 부모다 " + i + "의");
                         int startX = (forPrint.get(i).line+1)*100 +50 ;
                         int startY = (i+1)*70 +50 ;
                         int endX = (forPrint.get(j).line+1)*100+50 ;
@@ -162,19 +179,59 @@ public class GitCommitHistory {
                         int b=startY;
                         for(;b<endY;b+=(dify/20)){
                             a+=(difx/20);
+                            /*
                             JLabel label = new JLabel(new ImageIcon("image1.png"));
                             label.setBounds(a,b,3,3);
                             framed.add(label);
+                            */
+                            labelss[count_labelssSize] = new JLabel(new ImageIcon("image1.png"));
+                            labelss[count_labelssSize].setBounds(a,b,3,3);
+                            framed.add(labelss[count_labelssSize]);
+
+                            count_labelssSize++;
                         }
                     }
                 }
             }
+            //framed.add(labelss);
+
+            JButton upMoveButton = new JButton("up");
+            upMoveButton.setBounds(10,10,50,50);
+            upMoveButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    numOfDownClik--;
+                    for (int i = 0; i < forPrint.size(); i++) {
+                        //textFields[i].setLocation((forPrint.get(i).line+1)*100, (i+1)*70 - numOfDownClik*50);
+                        textFields[i].setLocation(textFields[i].getX(), textFields[i].getY() + 50);
+                    }
+                    for(int i=0;i<count_labelssSize;i++){
+                        labelss[i].setLocation(labelss[i].getX(), labelss[i].getY() + 50);
+                    }
+                }
+            });
+            framed.add(upMoveButton);
+
+            JButton downMoveButton = new JButton("down");
+            downMoveButton.setBounds(10,70,50,50);
+            downMoveButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    numOfDownClik++;
+                    for (int i = 0; i < forPrint.size(); i++) {
+                        //textFields[i].setLocation((forPrint.get(i).line+1)*100, (i+1)*70 - numOfDownClik*50);
+                        textFields[i].setLocation(textFields[i].getX(), textFields[i].getY() - 50);
+                    }
+                    for(int i=0;i<count_labelssSize;i++){
+                        labelss[i].setLocation(labelss[i].getX(), labelss[i].getY() - 50);
+                    }
+                }
+            });
+            framed.add(downMoveButton);
 
 
-
-            framed.setSize(500, 400);
+            framed.setSize(500, 800);
             framed.setVisible(true);
-
             framed.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
@@ -208,18 +265,6 @@ public class GitCommitHistory {
         infoWindow.setVisible(true);
     }
 
-
-    private static String createGraph(int parentCount) {
-        StringBuilder graphBuilder = new StringBuilder();
-        for (int i = 0; i < parentCount - 1; i++) {
-            graphBuilder.append("|  ");
-        }
-        if (parentCount > 0) {
-            graphBuilder.append("|--");
-        }
-        return graphBuilder.toString();
-    }
-
     private static int getCangoCount(ArrayList<String> visitedCS, RevCommit[] nodes){
         int result = nodes.length;
         for(RevCommit node : nodes){
@@ -233,28 +278,9 @@ public class GitCommitHistory {
         //forPrintList.add(new textgraphAndCommit("123",node));
 
         int insertindex = calIndex(forPrintList, node, lineNum);
-        /*
-        String tempStr = "";
-        for(int i=0;i<lineNum;i++){
-            tempStr += "|____";
-        }
-        tempStr += "*____";
-        */
 
         forPrintList.add(insertindex, new textgraphAndCommit(lineNum ,node));//해당 줄
-/*
-        int count=0;
-        for(textgraphAndCommit forPrint : forPrintList){
-            if(count < insertindex){//insertindex 이전
-                forPrint.textgraph += "_____";
-            }
-            else if(count == insertindex){//insertindex 해당줄
-            }
-            else{//insertindex 이후
-                forPrint.textgraph += "|____";
-            }
-            count++;
-        }*/
+
     }
 
     private static int calIndex(ArrayList<textgraphAndCommit> forPrintList,RevCommit node,int lineNum){
