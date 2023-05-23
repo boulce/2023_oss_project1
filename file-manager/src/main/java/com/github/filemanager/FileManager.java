@@ -437,39 +437,6 @@ public class FileManager {//asdfasdf
 
 
 
-
-
-
-/*
-            //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
-            JPopupMenu popupMenuRemoved = new JPopupMenu();
-            JMenuItem gitremoved= new JMenuItem("git rm for removed");
-
-            popupMenuStaged.add(gitremoved);
-
-            table.setComponentPopupMenu(popupMenuRemoved);
-            gitremoved.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showMessageDialog(null, "git rm'ed file, what should i do");
-
-
-                    Status status = null;
-                    try {
-                        status = git.status().call();
-                    } catch (GitAPIException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    fileTableModel.setGit(status, currentPath);
-                    table.repaint();
-                }
-
-
-            });
-
-*/
-
-
             //우클릭 처리 추가
             mouseAdapter =
                     new MouseAdapter() {
