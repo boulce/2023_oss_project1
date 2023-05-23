@@ -12,5 +12,6 @@ public class BranchList extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setVisible(true);
+        this.setResizable(false);
     }
 }

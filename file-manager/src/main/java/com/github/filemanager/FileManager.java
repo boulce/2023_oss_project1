@@ -898,6 +898,13 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            if(branchList == null){
+                                branchList = new BranchList();
+                            }
+                            else{
+                                branchList.dispose();
+                                branchList = new BranchList();
+                            }
                         }
                     }
 
