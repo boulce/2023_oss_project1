@@ -154,9 +154,9 @@ public class FileManager {//asdfasdf
 
     private JButton restore_missed;
 
-    private JButton branch_list_btn; // 브랜치 리스트 버튼
-
     private JButton branch_Create_btn; //F1: 브랜치 생성
+
+    private JButton merge_btn; // merge 버튼
 
     private JLabel fileName;
     private JTextField path;
@@ -612,9 +612,11 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
 
-                                branch_list_btn.setEnabled(true); // branch_list_btn 활성화
+
                                 branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
                                 //브랜치 이름
+                                merge_btn.setEnabled(true); // branch_list_btn 활성화
+
 
 
                                 try {
@@ -628,8 +630,8 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(false);
                                 restore_missed.setEnabled(false);
 
-                                branch_list_btn.setEnabled(false); // branch_list_btn 비활성화
                                 branch_Create_btn.setEnabled(false); // Branch create 버튼 비활성화
+                                merge_btn.setEnabled(false); // branch_list_btn 비활성화
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -827,6 +829,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                merge_btn.setEnabled(false); // branch_list_btn 비활성화
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -905,33 +908,7 @@ public class FileManager {//asdfasdf
             toolBar.add(restore_missed);
 
 
-            // toolBarForBranch에 위치한 버튼들
-
-            //Branch list 버튼
-            branch_list_btn = new JButton("Branch List");
-            branch_list_btn.addActionListener(
-
-                    new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if(branchList == null){
-                                try {
-                                    branchList = new BranchList(git);
-                                } catch (GitAPIException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                            }
-                            else{
-                                branchList.dispose();
-                                try {
-                                    branchList = new BranchList(git);
-                                } catch (GitAPIException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                            }
-                        }
-                    }
-            );
+            // toolBarForBranch에 위치한 버튼
 
             //6. 브랜치 생성 버튼
             branch_Create_btn = new JButton("Branch Create");
@@ -945,10 +922,38 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            // 브랜치 Delete, Rename, Checkout은 브랜치 리스트에서 구현하기
+            // merge 버튼
+            merge_btn = new JButton("Merge");
+            merge_btn.addActionListener(
 
-            toolBarForBranch.add(branch_list_btn);
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if(branchList == null){
+                                try {
+
+                                    branchList = new BranchList(git, 3);
+                                } catch (GitAPIException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
+                            else{
+                                branchList.dispose();
+                                try {
+                                    branchList = new BranchList(git, 3);
+                                } catch (GitAPIException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
+                        }
+                    }
+            );
+
+            // 브랜치 Delete, Rename, Checkout
+
             toolBarForBranch.add(branch_Create_btn);
+            toolBarForBranch.add(merge_btn);
+
 
             toolBarForBranch.addSeparator();
             //브랜치 이름 글자로 띄우기
