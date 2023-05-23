@@ -156,6 +156,8 @@ public class FileManager {//asdfasdf
 
     private JButton branch_list_btn; // 브랜치 리스트 버튼
 
+    private JButton branch_Create_btn; //F1: 브랜치 생성
+
     private JLabel fileName;
     private JTextField path;
     private JLabel date;
@@ -174,6 +176,8 @@ public class FileManager {//asdfasdf
 
     private int commitTableRow; //commit table에서 removed를 클릭하면 반환하는 row
     private BranchList branchList; // branch list 창
+
+    private BranchManagement branchManagement; //branch Management (Feature1)
 
     public Container getGui() {
         if (gui == null) {
@@ -609,6 +613,7 @@ public class FileManager {//asdfasdf
                                 restore_missed.setEnabled(true);
 
                                 branch_list_btn.setEnabled(true); // branch_list_btn 활성화
+                                branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -621,6 +626,7 @@ public class FileManager {//asdfasdf
                                 restore_missed.setEnabled(false);
 
                                 branch_list_btn.setEnabled(false); // branch_list_btn 비활성화
+                                branch_Create_btn.setEnabled(false); // Branch create 버튼 비활성화
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -919,9 +925,24 @@ public class FileManager {//asdfasdf
                             }
                         }
                     }
-
             );
+
+            //6. 브랜치 생성 버튼
+            branch_Create_btn = new JButton("Branch Create");
+            branch_Create_btn.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                        }
+                    }
+            );
+
+            // 브랜치 삭제, Rename, Checkout은 브랜치 리스트에서 구현
+
             toolBarForBranch.add(branch_list_btn);
+            toolBarForBranch.add(branch_Create_btn);
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
