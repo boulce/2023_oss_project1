@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,8 +66,17 @@ public class BranchList extends JFrame {
                         // 위 값을 각자의 클래스에 전달해서 잘 처리해주는 식으로 구현하기
                         // ex) 해솔이 같은 경우에는 선택한 값 BranchManagement로 가져가서 사용
                         // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
-
-                        dispose(); // 창 종료
+                        boolean is_successful_merge;
+                        try {
+                            is_successful_merge = BranchMerge.branchMerge(git, (String) value);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (GitAPIException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
+                            dispose(); // 창 종료
+                        }
                     }
                 }
         );
