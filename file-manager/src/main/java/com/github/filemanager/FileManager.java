@@ -903,11 +903,19 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             if(branchList == null){
-                                branchList = new BranchList();
+                                try {
+                                    branchList = new BranchList(git);
+                                } catch (GitAPIException ex) {
+                                    throw new RuntimeException(ex);
+                                }
                             }
                             else{
                                 branchList.dispose();
-                                branchList = new BranchList();
+                                try {
+                                    branchList = new BranchList(git);
+                                } catch (GitAPIException ex) {
+                                    throw new RuntimeException(ex);
+                                }
                             }
                         }
                     }
