@@ -11,16 +11,20 @@ import java.io.BufferedReader;
 
 public class GitClone {
         String repoUrl;
-        String localPath;
+        String gitID;
         String accessToken;
+        String localPath;
+
         HashMap<String,String> dict;
 
-    public GitClone(String repoUrl,String localPath, String accessToken) {
+    public GitClone(String repoUrl,String gitID, String accessToken,String localPath) throws GitAPIException {
         this.repoUrl=repoUrl;
-        this.localPath=localPath;
+        this.gitID=gitID;
         this.accessToken=accessToken;
+        this.localPath=localPath;
+
         dict=new HashMap<>();
-        cloneRepoPrivate(repoUrl,localPath,accessToken);
+        cloneRepoPrivate(repoUrl,gitID,accessToken,localPath);
     }
 
 
@@ -57,16 +61,23 @@ public class GitClone {
 
 
 
-    public void cloneRepoPrivate(String repoUrl, String localPath, String accessToken) {
+    public void cloneRepoPrivate(String repoUrl, String gitID, String accessToken,String localPath) throws GitAPIException {
         try {
-            accessToken="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"; //임시로 발급받은 코드
+            accessToken="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"; //임시로 발급받은 코드
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("YoungHoney", accessToken))
+
                     .call();
         } catch (GitAPIException e) {
-            e.printStackTrace();
+
+            Git.cloneRepository()
+                    .setURI(repoUrl)
+                    .setDirectory(new File(localPath))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("yhyh5275@naver.com", accessToken)) //email도 되고, username도 가능
+                    .call();
+
+           // e.printStackTrace();
         }
     }
 
