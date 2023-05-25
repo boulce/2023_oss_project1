@@ -154,6 +154,7 @@ public class FileManager {//asdfasdf
 
     private JButton restore_missed;
 
+    private JButton git_clone; //테스트용 버튼 곽수정
     private JButton gitCommitHistory;
 
     private JLabel fileName;
@@ -578,6 +579,7 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
+                                git_clone.setEnabled(true); //곽수정
                                 gitCommitHistory.setEnabled(true);
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
@@ -858,6 +860,28 @@ public class FileManager {//asdfasdf
 
             );
             toolBar.add(restore_missed);
+
+
+            //5. git clone기능, 테스트용도 곽수정
+
+
+            git_clone = new JButton("git clone");
+            git_clone.addActionListener(
+
+
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+                            String inputRepoUrl = JOptionPane.showInputDialog("git repo 주소를 입력하세요");
+                            gitclone(inputRepoUrl, String.valueOf(currentPath),"");
+
+                        }
+                    }
+
+            );
+            toolBar.add(git_clone);
 
             ///////////////////////////////////////git history 보여주는 부분
             gitCommitHistory = new JButton("Git Commit History");
@@ -1277,6 +1301,16 @@ public class FileManager {//asdfasdf
         }
 
         refresh();
+
+    }
+
+    //5. git clone 테스트용도 곽수정
+
+    private void gitclone(String repoUrl,String localPath, String accessToken)  {
+
+
+        new GitClone(repoUrl,localPath,"");
+
 
     }
 
