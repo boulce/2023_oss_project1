@@ -158,6 +158,7 @@ public class FileManager {//asdfasdf
     private JButton branch_Delete_btn;
     private JButton branch_Rename_btn;
     private JButton branch_Checkout_btn;
+
     private JButton merge_btn; // merge 버튼
 
     private JLabel fileName;
@@ -614,12 +615,9 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
 
-
                                 branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
                                 //브랜치 delete, rename, checkout은 항상 활성화 된 후, 브랜치 리스트에서 선택 후 진행된다.
                                 merge_btn.setEnabled(true); // branch_list_btn 활성화
-
-
 
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
@@ -831,7 +829,8 @@ public class FileManager {//asdfasdf
                                 gitcommit.setEnabled(true); // git commit 버튼을 disable하고
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
-                                merge_btn.setEnabled(false); // branch_list_btn 비활성화
+                                merge_btn.setEnabled(true);
+
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -910,12 +909,6 @@ public class FileManager {//asdfasdf
             toolBar.add(restore_missed);
 
 
-<<<<<<< HEAD
-            // toolBarForBranch에 위치한 버튼들
-            // 임시 Branch list 버튼
-            branch_list_btn = new JButton("Branch List");
-            branch_list_btn.addActionListener(
-=======
             // toolBarForBranch에 위치한 버튼
 
             //6. 브랜치 생성 버튼
@@ -969,17 +962,12 @@ public class FileManager {//asdfasdf
             // merge 버튼
             merge_btn = new JButton("Merge");
             merge_btn.addActionListener(
->>>>>>> f1JHS
 
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             if(branchList == null){
                                 try {
-<<<<<<< HEAD
-=======
-
->>>>>>> f1JHS
                                     branchList = new BranchList(git, 3);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
@@ -1008,6 +996,9 @@ public class FileManager {//asdfasdf
 
 
             //브랜치 이름 글자로 띄우기
+
+            toolBarForBranch.add(merge_btn);
+
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
