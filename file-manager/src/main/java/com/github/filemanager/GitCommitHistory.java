@@ -72,6 +72,7 @@ public class GitCommitHistory {
             }
 
             // git log 출력
+            /*
             for (branchAndCommit commit : commits) {
                 System.out.println(
                         "-------------------------------------------" +
@@ -80,7 +81,7 @@ public class GitCommitHistory {
                         "  message: " + commit.commitname.getShortMessage());
                 //"Author: " + commit.getAuthorIdent().getName() + " <" + commit.getAuthorIdent().getEmailAddress() + ">"
             }
-
+*/
 
 
             //dfs방식 구현
@@ -158,7 +159,8 @@ public class GitCommitHistory {
                 }
             }
             */
-            JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * 20];
+            int tNumOfImages = 80;
+            JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * tNumOfImages];
 
             count_labelssSize=0;
             //선 긋기. //이미지로 구현
@@ -166,26 +168,29 @@ public class GitCommitHistory {
                 for(int j=i;j<forPrint.size();j++){
                     if(AisParentOfB(forPrint.get(j),forPrint.get(i))){
                         //System.out.println(j + "는 부모다 " + i + "의");
-                        int startX = (forPrint.get(i).line+1)*100 +50 ;
-                        int startY = (i+1)*70 +50 ;
-                        int endX = (forPrint.get(j).line+1)*100+50 ;
-                        int endY = (j+1)*70+50 ;
+                        int startX = (forPrint.get(i).line+1)*100 + 75 ;
+                        int startY = (i+1)*70 +25 ;
+                        int endX = (forPrint.get(j).line+1)*100+ 75 ;
+                        int endY = (j+1)*70+25 ;
 
                         int difx=endX-startX;
                         int dify=endY-startY;
 
                         //이미지로 선 긋자.
-                        int a=startX;
-                        int b=startY;
-                        for(;b<endY;b+=(dify/20)){
-                            a+=(difx/20);
+                        float a=startX;
+                        float b=startY;
+                        int c;
+                        for(c=0;c< tNumOfImages;c++){
+                            a = startX +  ((c * difx)/tNumOfImages);
+                            b = startY +  ((c * dify)/tNumOfImages);
+
                             /*
                             JLabel label = new JLabel(new ImageIcon("image1.png"));
                             label.setBounds(a,b,3,3);
                             framed.add(label);
                             */
                             labelss[count_labelssSize] = new JLabel(new ImageIcon("image1.png"));
-                            labelss[count_labelssSize].setBounds(a,b,3,3);
+                            labelss[count_labelssSize].setBounds((int)a,(int)b,3,3);
                             framed.add(labelss[count_labelssSize]);
 
                             count_labelssSize++;
