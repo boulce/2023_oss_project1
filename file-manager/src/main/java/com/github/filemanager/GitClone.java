@@ -28,13 +28,6 @@ public class GitClone {
     }
 
 
-    public  String readTokenFromFile() throws IOException { //access token이 둘이상의 줄이면 반복문으로 읽어야함, 현재는 token이 한줄로 있다고 가정
-        BufferedReader reader = new BufferedReader(new FileReader("token.txt"));
-        String token = reader.readLine();
-        reader.close();
-        return token;
-
-    }
 
     public String readTokenFromFileHash(String ID) throws IOException {
         String key = null;
