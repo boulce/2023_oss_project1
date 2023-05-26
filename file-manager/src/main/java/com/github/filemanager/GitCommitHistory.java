@@ -189,7 +189,12 @@ public class GitCommitHistory {
                             label.setBounds(a,b,3,3);
                             framed.add(label);
                             */
-                            labelss[count_labelssSize] = new JLabel(new ImageIcon("image1.png"));
+                            //ImageIcon img = new ImageIcon(GitCommitHistory.class.getClassLoader().getResource("image1.png"));
+                            JLabel starlabel = new JLabel();
+                            starlabel.setText("*");
+                            starlabel.setBackground(Color.BLACK);
+                            starlabel.setOpaque(true);
+                            labelss[count_labelssSize] = starlabel;//new ImageIcon(imagePath));
                             labelss[count_labelssSize].setBounds((int)a,(int)b,3,3);
                             framed.add(labelss[count_labelssSize]);
 
