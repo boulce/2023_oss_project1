@@ -18,14 +18,12 @@ public class GitClone {
 
 
 
-    public GitClone(String repoUrl,String gitID, String accessToken,String localPath) throws GitAPIException, IOException {
-        this.repoUrl=repoUrl;
-        this.gitID=gitID;
-        this.accessToken=accessToken;
+    public GitClone(String localPath) throws GitAPIException, IOException {
+
         this.localPath=localPath;
 
 
-        cloneRepoPrivate(repoUrl,gitID,accessToken,localPath);
+        cloneRepoPrivate(localPath);
     }
 
 
@@ -77,27 +75,33 @@ public class GitClone {
 
     }
 
-    public void cloneRepoPrivate(String repoUrl, String gitID, String accessToken,String localPath) throws GitAPIException, IOException {
+    public void cloneRepoPrivate(String localPath) throws GitAPIException, IOException {
         String settingpath=OsUtils.getAbsolutePathByOs(System.getProperty("user.dir")+"\\src\\main\\resources\\settings.txt");
 
 
         try {
-
+//repo 물어보고
+            String inputRepoUrl = JOptionPane.showInputDialog("git repo 주소를 입력하세요");
+            this.repoUrl=inputRepoUrl;
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
 
                     .call();
         } catch (GitAPIException e) {
+// id ,token 입력 창
+
+            //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
+            String inputID=JOptionPane.showInputDialog("git username 또는 로그인에 필요한 email을 입력하세요");
+            String inputToken=JOptionPane.showInputDialog("git의 AccessToken을 입력하세요");
+            this.gitID=inputID;
+            this.accessToken=inputToken;
 
             ReadWriteSetting(gitID,accessToken,settingpath);
-            //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
-
-
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitID, accessToken))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitID, this.accessToken))
                     .call();
 
 

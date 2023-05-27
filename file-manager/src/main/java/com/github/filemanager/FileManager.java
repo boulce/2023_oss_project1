@@ -876,14 +876,12 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
-                            String inputRepoUrl = JOptionPane.showInputDialog("git repo 주소를 입력하세요");
-                            String inputID=JOptionPane.showInputDialog("git username 또는 로그인에 필요한 email을 입력하세요");
-                            String inputToken=JOptionPane.showInputDialog("git의 AccessToken을 입력하세요");
+
 
 
 
                             try {
-                                gitclone(inputRepoUrl, inputID,inputToken,String.valueOf(currentPath));
+                                gitclone(String.valueOf(currentPath));
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             } catch (FileNotFoundException ex) {
@@ -1321,11 +1319,11 @@ public class FileManager {//asdfasdf
 
     //5. git clone 테스트용도 곽수정
 
-    private void gitclone(String repoUrl,String gitID,String accessToken,String localPath) throws GitAPIException, IOException {
+    private void gitclone(String localPath) throws GitAPIException, IOException {
 
 
 
-        new GitClone(repoUrl,gitID,accessToken,localPath);
+        new GitClone(localPath);
         git=Git.init().setDirectory(currentPath).call(); //refresh를 구현하기위해 FileManager의 attribute인 git을 초기화할 필요가 있음, 로직상 git clone은 non-git폴더를 왼쪽 트리에서 고르면서 시작되므로 git이 초기화되어있지 않음. 임시로 초기화  곽수정
         refresh();
     }
