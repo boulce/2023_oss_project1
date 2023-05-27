@@ -1,4 +1,5 @@
 package com.github.filemanager;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -10,11 +11,11 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.Ref;
 
 
-public class BranchManagement  extends JFrame{
+public class BranchManagement extends JFrame {
     private JTextField branchName;
 
     //1. 현재 브랜치 이름 띄우기 -현재 경로가 깃으로 관리 되고 있는지 확인, 관리되고 있으면 파일매니저 우측 하단 패널에 브랜치명 띄우기
-    public String BranchName (Git git, File currentPath, Repository repository){
+    public String BranchName(Git git, File currentPath, Repository repository) {
         if (GitUtilsForTrack.isGitRepository(currentPath)) {
             try {
                 git.status().call(); //git으로 관리되고 있으면
@@ -30,14 +31,13 @@ public class BranchManagement  extends JFrame{
     }
 
 
-
     //2. New Branch Create
     public void BranchCreate(Git git, String name) throws GitAPIException {
         //버튼 입력 이벤트 받음. 실행. Jgit에서 브랜치 생성
 
         // valiation
-        for(Ref ref : git.branchList().call()) {
-            if(ref.getName().equals("refs/heads/" + name)) {
+        for (Ref ref : git.branchList().call()) {
+            if (ref.getName().equals("refs/heads/" + name)) {
                 System.out.println("Branch already exists");
                 return;
             }
@@ -50,10 +50,9 @@ public class BranchManagement  extends JFrame{
     }
 
 
-
-    public String[] getBranchNamesToDeleteList(Git git, String current_branch) throws GitAPIException {
+    public String[] getBranchNamesList(Git git, String current_branch) throws GitAPIException {
         String[] branchNames = new String[git.branchList().call().size() - 1];
-        int i =0;
+        int i = 0;
 
         for (Ref ref : git.branchList().call()) {
             // refs/head/actual_name
@@ -73,12 +72,22 @@ public class BranchManagement  extends JFrame{
 
     }
 
-
-
-
     //4. Branch Rename
+    public void BranchRename(Git git, String oldName, String newName) throws GitAPIException {
+
+
+        git.branchRename().setOldName(oldName).setNewName(newName).call();
+
+    }
 
     //5. Branch Checkout
+    public void BranchCheckout(Git git, String name) throws GitAPIException {
+
+
+        git.checkout().setName(name).call();
+
+    }
+
 
     //6. Error Popup
 

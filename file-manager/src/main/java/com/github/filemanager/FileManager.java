@@ -287,7 +287,6 @@ public class FileManager {//asdfasdf
                         checkout.call();
 
 
-
                         Status status = git.status().call();
                         fileTableModel.setGit(status, currentPath);
                         table.repaint();
@@ -932,8 +931,8 @@ public class FileManager {//asdfasdf
                         public void actionPerformed(ActionEvent e) {
 
                             try {
-                                String[] options = branchManagement.getBranchNamesToDeleteList(git, branchName.getText());
-                                int selection = JOptionPane.showOptionDialog(null, "Select one:", "Branch list",
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one you want to delete:", "Branch list",
                                         0, 3, null, options, options[0]);
                                 if (selection != -1)
                                     branchManagement.BranchDelete(git, options[selection]);
@@ -954,7 +953,19 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            try {
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one you want to rename:", "Branch list",
+                                        0, 3, null, options, options[0]);
+                                if (selection != -1) {
+                                    String newName = JOptionPane.showInputDialog("Enter the new branch name");
+                                    branchManagement.BranchRename(git, options[selection], newName);
+                                }
 
+
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );
@@ -966,7 +977,18 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            try {
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one you want to checkout:", "Branch list",
+                                        0, 3, null, options, options[0]);
+                                if (selection != -1) {
+                                    branchManagement.BranchCheckout(git, options[selection]);
+                                }
 
+
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );
@@ -978,14 +1000,13 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if(branchList == null){
+                            if (branchList == null) {
                                 try {
                                     branchList = new BranchList(git, 3);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
                                 }
-                            }
-                            else{
+                            } else {
                                 branchList.dispose();
                                 try {
                                     branchList = new BranchList(git, 3);
@@ -1049,7 +1070,6 @@ public class FileManager {//asdfasdf
         }
         return gui;
     }
-
 
 
     public Repository openGitRepository(String path) {
@@ -1436,9 +1456,7 @@ public class FileManager {//asdfasdf
                 }
 
             } //removed의 while 끝
-        }
-
-        else {
+        } else {
             JOptionPane.showMessageDialog(null, "there are no Modified:deleted");
         }
 
@@ -1630,7 +1648,7 @@ public class FileManager {//asdfasdf
         path.setText(file.getPath());
         date.setText(new Date(file.lastModified()).toString());
         size.setText(file.length() + " bytes");
-       // branchName.setText("브랜치"); //현재 브랜치 이름 우측 하단 영역에 표시 -현재 깃으로 관리되고 있지 않으면?
+        // branchName.setText("브랜치"); //현재 브랜치 이름 우측 하단 영역에 표시 -현재 깃으로 관리되고 있지 않으면?
 
 
         JFrame f = (JFrame) gui.getTopLevelAncestor();
