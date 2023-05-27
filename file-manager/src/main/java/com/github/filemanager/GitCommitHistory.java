@@ -119,7 +119,7 @@ public class GitCommitHistory {
             }
 
             for(textgraphAndCommit forprint_ : forPrint){
-                System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
+                //System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
             }
 
             JFrame framed = new JFrame("Image Click Example");
@@ -131,14 +131,18 @@ public class GitCommitHistory {
             // 이미지 로드
             int countfortextFields =0;
             for(textgraphAndCommit forprint_ : forPrint){
-                textFields[countfortextFields] = new JButton(forprint_.commitname.getShortMessage());
+                textFields[countfortextFields] = new JButton(forprint_.commitname.getAuthorIdent().getName() + " : " + forprint_.commitname.getShortMessage());
                 countfortextFields++;
             }
 
-
+            /*
+            for(textgraphAndCommit forprint_ : forPrint){
+                System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
+            }
+*/
             // 이미지 레이블 생성 및 설정
             for (int i = 0; i < forPrint.size(); i++) {
-                textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150,50);
+                textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150 * 3,50);
                 //labels[i].setBounds(100, (i +                //labels[i] = new JLabel(textFields[i]); 1) * 30, images[i].getIconWidth(), images[i].getIconHeight());
 
                 final int index = i; // MouseAdapter에서 참조하기 위해 인덱스를 final 변수로 설정
@@ -146,11 +150,11 @@ public class GitCommitHistory {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         if(refwindow == null){
-                            refwindow = showInfoWindow(index);
+                            refwindow = showInfoWindow(index, forPrint.get(index));
                         }
                         else{
                             refwindow.dispose();
-                            refwindow = showInfoWindow(index);
+                            refwindow = showInfoWindow(index, forPrint.get(index));
                         }
                     }
                 });
@@ -272,8 +276,8 @@ public class GitCommitHistory {
         }
         return false;
     }
-    private static JFrame showInfoWindow(int index) {
-        JFrame infoWindow = new JFrame("Image Info Window");
+    private static JFrame showInfoWindow(int index, textgraphAndCommit TGCcommit) {
+        JFrame infoWindow = new JFrame(TGCcommit.commitname.getName() + TGCcommit.commitname.getShortMessage());
         infoWindow.setLayout(new FlowLayout());
         infoWindow.setSize(300, 200);
 
