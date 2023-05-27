@@ -915,14 +915,19 @@ public class FileManager {//asdfasdf
 
             // toolBarForBranch에 위치한 버튼
 
-            //6. 브랜치 생성 버튼
+            //6. Branch Create 버튼
             branch_Create_btn = new JButton("Branch Create");
             branch_Create_btn.addActionListener(
 
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-
+                            try {
+                                String newBranchName = JOptionPane.showInputDialog("Enter the new branch name");
+                                branchManagement.BranchCreate(git, newBranchName);
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );

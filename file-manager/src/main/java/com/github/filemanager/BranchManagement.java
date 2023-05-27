@@ -36,9 +36,20 @@ public class BranchManagement  extends JFrame{
 
 
     //2. New Branch Create
-    public void BranchCreate() throws GitAPIException {
+    public void BranchCreate(Git git, String name) throws GitAPIException {
         //버튼 입력 이벤트 받음. 실행. Jgit에서 브랜치 생성
 
+        // valiation
+        for(Ref ref : git.branchList().call()) {
+            if(ref.getName().equals("refs/heads/" + name)) {
+                System.out.println("Branch already exists");
+                return;
+            }
+        }
+
+        git.branchCreate()
+                .setName(name)
+                .call();
 
     }
 
