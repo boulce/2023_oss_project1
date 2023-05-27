@@ -26,6 +26,7 @@ package com.github.filemanager;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
@@ -885,6 +886,10 @@ public class FileManager {//asdfasdf
                                 gitclone(inputRepoUrl, inputID,inputToken,String.valueOf(currentPath));
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
+                            } catch (FileNotFoundException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
                             }
 
                         }
@@ -1316,7 +1321,7 @@ public class FileManager {//asdfasdf
 
     //5. git clone 테스트용도 곽수정
 
-    private void gitclone(String repoUrl,String gitID,String accessToken,String localPath) throws GitAPIException {
+    private void gitclone(String repoUrl,String gitID,String accessToken,String localPath) throws GitAPIException, IOException {
 
 
 

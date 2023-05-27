@@ -15,48 +15,64 @@ public class GitClone {
         String accessToken;
         String localPath;
 
-        HashMap<String,String> dict;
 
-    public GitClone(String repoUrl,String gitID, String accessToken,String localPath) throws GitAPIException {
+
+    public GitClone(String repoUrl,String gitID, String accessToken,String localPath) throws GitAPIException, IOException {
         this.repoUrl=repoUrl;
         this.gitID=gitID;
         this.accessToken=accessToken;
         this.localPath=localPath;
 
-        dict=new HashMap<>();
+
         cloneRepoPrivate(repoUrl,gitID,accessToken,localPath);
     }
 
 
 
-    public String readTokenFromFileHash(String ID) throws IOException {
-        String key = null;
-        try{
-            BufferedReader br=new BufferedReader(new FileReader(localPath));
-            String line;
-            while((line=br.readLine())!=null) {
-                String[] parts=line.split(" ");
-                if(parts.length==2) {
-                    key=parts[0];
-                    String value = parts[1];
-                    dict.put(key,value);
+
+    public void ReadWriteSetting(String gitID, String accessToken, String settingpath) throws IOException {
+
+        BufferedReader br=new BufferedReader(new FileReader(settingpath));
+        StringBuilder sb=new StringBuilder();
+        boolean idExists=false;
+
+        String line;
+
+        while((line=br.readLine())!=null) {
+            String[] parts=line.split(" ");
+            if(parts.length==2) {
+                String existkey=parts[0];
+                String existvalue = parts[1];
+
+                if(existkey.equals(gitID)) {
+                    sb.append(gitID).append(" ").append(accessToken).append(System.lineSeparator());
+                    idExists=true;
                 } else {
-                    System.out.println("Invalid entry: "+line);
+                    sb.append(line).append(System.lineSeparator());
                 }
+
+            } else {
+                System.out.println("Invalid entry: "+line);
             }
-        } catch (IOException e) {
-                e.printStackTrace();
+        }
+        br.close();
+
+        if(!idExists) {
+            sb.append(gitID).append(" ").append(accessToken).append(System.lineSeparator());
         }
 
+        BufferedWriter bw = new BufferedWriter(new FileWriter(settingpath));
+        bw.write(sb.toString());
+        bw.close();
 
-        return dict.get(key);
     }
 
+    public void cloneRepoPrivate(String repoUrl, String gitID, String accessToken,String localPath) throws GitAPIException, IOException {
+        String settingpath=System.getProperty("user.dir")+"\\src\\main\\resources\\settings.txt";
 
 
-    public void cloneRepoPrivate(String repoUrl, String gitID, String accessToken,String localPath) throws GitAPIException {
         try {
-            accessToken="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"; //임시로 발급받은 코드
+
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
@@ -64,13 +80,17 @@ public class GitClone {
                     .call();
         } catch (GitAPIException e) {
 
+            ReadWriteSetting(gitID,accessToken,settingpath);
+            //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
+
+
             Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(new File(localPath))
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider("yhyh5275@naver.com", accessToken)) //email도 되고, username도 가능
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitID, accessToken)) //email도 되고, username도 가능
                     .call();
 
-           // e.printStackTrace();
+
         }
     }
 
