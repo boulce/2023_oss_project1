@@ -44,6 +44,8 @@ public class GitCommitHistory {
     static int count_labelssSize=0;
     static int numOfDownClik=0;
     //int count_labelssSize=0;
+    static JFrame refwindow =null;
+
 
     public static void showCommitHistory(Git git) throws GitAPIException {
 
@@ -143,7 +145,13 @@ public class GitCommitHistory {
                 textFields[i].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        showInfoWindow(index);
+                        if(refwindow == null){
+                            refwindow = showInfoWindow(index);
+                        }
+                        else{
+                            refwindow.dispose();
+                            refwindow = showInfoWindow(index);
+                        }
                     }
                 });
                 framed.add(textFields[i]);
@@ -159,7 +167,7 @@ public class GitCommitHistory {
                 }
             }
             */
-            int tNumOfImages = 80;
+            int tNumOfImages = 200;
             JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * tNumOfImages];
 
             count_labelssSize=0;
@@ -264,7 +272,7 @@ public class GitCommitHistory {
         }
         return false;
     }
-    private static void showInfoWindow(int index) {
+    private static JFrame showInfoWindow(int index) {
         JFrame infoWindow = new JFrame("Image Info Window");
         infoWindow.setLayout(new FlowLayout());
         infoWindow.setSize(300, 200);
@@ -273,6 +281,7 @@ public class GitCommitHistory {
         infoWindow.add(infoLabel);
 
         infoWindow.setVisible(true);
+        return infoWindow;
     }
 
     private static int getCangoCount(ArrayList<String> visitedCS, RevCommit[] nodes){
