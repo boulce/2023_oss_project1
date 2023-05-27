@@ -882,12 +882,10 @@ public class FileManager {//asdfasdf
 
                             try {
                                 gitclone(String.valueOf(currentPath));
-                            } catch (GitAPIException ex) {
-                                throw new RuntimeException(ex);
-                            } catch (FileNotFoundException ex) {
-                                throw new RuntimeException(ex);
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
+                            } catch (GitAPIException | IOException ex) {
+                                System.out.println("storm aa");
+                                JOptionPane.showMessageDialog(null, "에러 발생! : "+ex.getMessage());
+                               // throw new RuntimeException(ex);
                             }
 
                         }

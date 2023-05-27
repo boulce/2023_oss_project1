@@ -3,6 +3,7 @@ package com.github.filemanager;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import javax.swing.*;
@@ -88,8 +89,12 @@ public class GitClone {
                     .setDirectory(new File(localPath))
 
                     .call();
+        } catch(JGitInternalException e) {
+            JOptionPane.showMessageDialog(null, "에러 발생! : "+e.getMessage());
+
         } catch (GitAPIException e) {
 // id ,token 입력 창
+
 
             //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
             String inputID=JOptionPane.showInputDialog("git username 또는 로그인에 필요한 email을 입력하세요");
