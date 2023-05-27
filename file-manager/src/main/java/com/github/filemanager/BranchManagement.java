@@ -1,12 +1,8 @@
 package com.github.filemanager;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
-import com.github.filemanager.GitUtilsForTrack.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -55,9 +51,30 @@ public class BranchManagement  extends JFrame{
 
 
 
+    public String[] getBranchNamesToDeleteList(Git git, String current_branch) throws GitAPIException {
+        String[] branchNames = new String[git.branchList().call().size() - 1];
+        int i =0;
+
+        for (Ref ref : git.branchList().call()) {
+            // refs/head/actual_name
+            String name = ref.getName().split("/")[2];
+            if (!current_branch.equals(name))
+                branchNames[i++] = ref.getName().split("/")[2];
+        }
+
+        return branchNames;
+    }
 
 
     //3. Branch Delete
+    public void BranchDelete(Git git, String name) throws GitAPIException {
+
+        git.branchDelete().setBranchNames(name).call();
+
+    }
+
+
+
 
     //4. Branch Rename
 

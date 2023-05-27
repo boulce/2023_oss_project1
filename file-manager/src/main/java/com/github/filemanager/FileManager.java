@@ -41,11 +41,8 @@ import org.apache.commons.io.FileUtils;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.commons.io.LineIterator;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
@@ -53,12 +50,6 @@ import org.eclipse.jgit.lib.Repository;
 import static com.github.filemanager.GitUtilsForTrack.*;
 
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-
-import static com.github.filemanager.BranchManagement.*;
-import static com.github.filemanager.BranchMerge.*;
-import static com.github.filemanager.GitClone.*;
-import static com.github.filemanager.GitCommitHistory.*;
-
 
 
 /**
@@ -940,6 +931,18 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
+                            try {
+                                String[] options = branchManagement.getBranchNamesToDeleteList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one:", "Branch list",
+                                        0, 3, null, options, options[0]);
+                                if (selection != -1)
+                                    branchManagement.BranchDelete(git, options[selection]);
+
+
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
                         }
                     }
             );
@@ -1694,7 +1697,7 @@ public class FileManager {//asdfasdf
 
         branchManagement = new BranchManagement();
 
-        branchName.setText("Branch name: " + branchManagement.BranchName(git, currentPath, repo));
+        branchName.setText(branchManagement.BranchName(git, currentPath, repo));
     }
 
 
