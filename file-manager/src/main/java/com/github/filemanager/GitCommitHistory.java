@@ -53,7 +53,7 @@ public class GitCommitHistory {
             //현재 브랜치 찾기.
             Repository repository = git.getRepository();
             String branchName = repository.getBranch();
-            System.out.println("Current Branch: " + branchName);
+            //System.out.println("Current Branch: " + branchName);
 
             // 모든 브랜치 가져오기
             List<Ref> branches = git.branchList().call();
@@ -65,7 +65,7 @@ public class GitCommitHistory {
                 Iterable<RevCommit> branchCommits = git.log().add(branch.getObjectId()).call();
                 //같은 브랜치인지 비교
                 if(branchName.equals(branch.getName().substring(branch.getName().lastIndexOf('/') + 1))){
-                    System.out.println(branch.getName());
+                    //System.out.println(branch.getName());
                     for (RevCommit commit : branchCommits) {
                         numOfCommits++;
                         commits.add(new branchAndCommit(branch.getName(), commit));
@@ -252,7 +252,7 @@ public class GitCommitHistory {
             framed.add(downMoveButton);
 
 
-            framed.setSize(500, 800);
+            framed.setSize(1500, 800);
             framed.setVisible(true);
             framed.addWindowListener(new WindowAdapter() {
                 @Override
@@ -281,9 +281,18 @@ public class GitCommitHistory {
         infoWindow.setLayout(new FlowLayout());
         infoWindow.setSize(300, 200);
 
-        JLabel infoLabel = new JLabel("Selected Image: " + (index + 1));
-        infoWindow.add(infoLabel);
+        int tNumOfLabel = 3;
+        JLabel infoLabel[] = new JLabel[tNumOfLabel];
+        infoLabel[0] = new JLabel("Name: " + TGCcommit.commitname.getAuthorIdent().getName());
+        infoLabel[1] = new JLabel("EmailAddress: " + TGCcommit.commitname.getAuthorIdent().getEmailAddress());
+        infoLabel[2] = new JLabel("CommitTime: " + TGCcommit.commitname.getCommitterIdent().getWhen());
+//infoLabel[3] = new JLabel("getAuthorIdent(): " + TGCcommit.commitname.getAuthorIdent().toString());
 
+        for(int i=0;i<tNumOfLabel;i++){
+            //textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150 * 3,50);
+            infoLabel[i].setBounds(30, (i+1) *20, 150,150);
+            infoWindow.add(infoLabel[i]);
+        }
         infoWindow.setVisible(true);
         return infoWindow;
     }
