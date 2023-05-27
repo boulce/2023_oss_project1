@@ -53,7 +53,9 @@ public class GitClone {
                         sb.append(gitID).append(" ").append(accessToken).append(System.lineSeparator());
                         idExists = true;
                     } else { //setting.txt에 있는 토큰 사용
-
+                        this.accessToken=existvalue;
+                        sb.append(line).append(System.lineSeparator());
+                        idExists=true;
                     }
                 } else { //새로운 ID가 setting에 존재하지 않는 경우
                     sb.append(line).append(System.lineSeparator());
