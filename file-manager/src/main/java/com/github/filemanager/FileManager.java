@@ -983,6 +983,7 @@ public class FileManager {//asdfasdf
                                         0, 3, null, options, options[0]);
                                 if (selection != -1) {
                                     branchManagement.BranchCheckout(git, options[selection]);
+                                    branchName.setText(options[selection]);
                                 }
 
 
