@@ -907,13 +907,15 @@ public class FileManager {//asdfasdf
                                     branchList = new BranchList(git, 3);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
                                 }
                             }
                             else{
                                 branchList.dispose();
                                 try {
                                     branchList = new BranchList(git, 3);
-                                } catch (GitAPIException ex) {
+                                } catch (GitAPIException | IOException ex) {
                                     throw new RuntimeException(ex);
                                 }
                             }
