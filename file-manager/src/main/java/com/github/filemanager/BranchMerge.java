@@ -17,13 +17,6 @@ public class BranchMerge {
         branchMerge 함수는 merge가 정상적으로 수행되면 true를 반환하고, 수행안되면 false를 반환한다.
      */
     public static boolean branchMerge(Git git, String target_branch_name) throws IOException, GitAPIException {
-        // merge하기 전에 checkout 되어 있어야 한다. 해솔이가 구현해야 하는 부분
-        CheckoutCommand coCmd = git.checkout();
-        coCmd.setName("main");
-        coCmd.setCreateBranch(false); // probably not needed, just to make sure
-        coCmd.call(); // switch to "master" branch
-        ///////////////////////////////////////////////////////////////////////////////////
-
         String current_branch_name = Repository.shortenRefName(git.getRepository().getFullBranch()); // 현재 checkout 된 브랜치 이름 저장         // 현재 checkout 된 브랜치에 target_branch를 merge한다.
         MergeCommand mgCmd = git.merge();
         mgCmd.include(git.getRepository().findRef(target_branch_name));
