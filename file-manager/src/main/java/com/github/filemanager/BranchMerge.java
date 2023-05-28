@@ -3,6 +3,7 @@ package com.github.filemanager;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -18,13 +19,13 @@ public class BranchMerge {
     public static boolean branchMerge(Git git, String target_branch_name) throws IOException, GitAPIException {
         // merge하기 전에 checkout 되어 있어야 한다. 해솔이가 구현해야 하는 부분
         CheckoutCommand coCmd = git.checkout();
-        coCmd.setName("master");
+        coCmd.setName("main");
         coCmd.setCreateBranch(false); // probably not needed, just to make sure
         coCmd.call(); // switch to "master" branch
         ///////////////////////////////////////////////////////////////////////////////////
 
-        String current_branch_name = git.getRepository().getFullBranch(); // 현재 checkout 된 브랜치 이름 저장
-        if(target_branch_name != current_branch_name){ // 선택한 target_branch가 current_branch와 달라야 merge 수행한다.
+        String current_branch_name = Repository.shortenRefName(git.getRepository().getFullBranch()); // 현재 checkout 된 브랜치 이름 저장
+        if(!target_branch_name.equals(current_branch_name)){ // 선택한 target_branch가 current_branch와 달라야 merge 수행한다.
             // 현재 checkout 된 브랜치에 target_branch를 merge한다.
             MergeCommand mgCmd = git.merge();
             mgCmd.include(git.getRepository().findRef(target_branch_name));

@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -40,8 +41,8 @@ public class BranchList extends JFrame {
 
         List<Ref> call = git.branchList().call();
         for (Ref branch_info : call) {
-                System.out.println("Branch: " + branch_info + " " + branch_info.getName() + " " + branch_info.getObjectId().getName());
-                Object[] rowData = {branch_info.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+//                System.out.println("Branch: " + branch_info + " " + branch_info.getName() + " " + branch_info.getObjectId().getName());
+                Object[] rowData = {Repository.shortenRefName(branch_info.getName())}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
                 model.addRow(rowData);
         }
 
