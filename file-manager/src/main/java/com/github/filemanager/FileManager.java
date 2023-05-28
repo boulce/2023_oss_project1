@@ -904,7 +904,7 @@ public class FileManager {//asdfasdf
                         public void actionPerformed(ActionEvent e) {
                             if(branchList == null){
                                 try {
-                                    branchList = new BranchList(git, 3);
+                                    branchList = new BranchList(git);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
                                 } catch (IOException ex) {
@@ -914,7 +914,7 @@ public class FileManager {//asdfasdf
                             else{
                                 branchList.dispose();
                                 try {
-                                    branchList = new BranchList(git, 3);
+                                    branchList = new BranchList(git);
                                 } catch (GitAPIException | IOException ex) {
                                     throw new RuntimeException(ex);
                                 }

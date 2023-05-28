@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BranchList extends JFrame {
-    public BranchList(Git git, int which_btn) throws GitAPIException, IOException {
+    public BranchList(Git git) throws GitAPIException, IOException {
         super("Branch List");
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
@@ -72,30 +72,17 @@ public class BranchList extends JFrame {
                         // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
 
 
-                        if(which_btn == 0){ // Delete
-
+                        boolean is_successful_merge;
+                        try {
+                            is_successful_merge = BranchMerge.branchMerge(git, (String) value);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (GitAPIException ex) {
+                            throw new RuntimeException(ex);
                         }
-                        else if(which_btn == 1){ // Rename
-
+                        if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
+                            dispose(); // 창 종료
                         }
-                        else if(which_btn == 2){ // Checkout
-
-                        }
-                        else if(which_btn == 3){ // Merge
-                            boolean is_successful_merge;
-                            try {
-                                is_successful_merge = BranchMerge.branchMerge(git, (String) value);
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
-                            } catch (GitAPIException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                            if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
-                                dispose(); // 창 종료
-                            }
-                        }
-
-
                     }
                 }
         );
