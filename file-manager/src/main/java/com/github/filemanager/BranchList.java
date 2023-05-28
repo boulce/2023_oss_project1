@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BranchList extends JFrame {
-    public BranchList(Git git) throws GitAPIException, IOException {
+    public BranchList(Git git, FileManager fm) throws GitAPIException, IOException {
         super("Branch List");
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
@@ -81,6 +81,11 @@ public class BranchList extends JFrame {
                             throw new RuntimeException(ex);
                         }
                         if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
+                            try {
+                                fm.refresh();
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                             dispose(); // 창 종료
                         }
                     }
