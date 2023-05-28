@@ -13,12 +13,18 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.*;
 
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import java.io.IOException;
 import java.util.List;
+
 
 
 class branchAndCommit{
@@ -73,18 +79,9 @@ public class GitCommitHistory {
                 }
             }
 
-            // git log 출력
-            /*
-            for (branchAndCommit commit : commits) {
-                System.out.println(
-                        "-------------------------------------------" +
-                        "  Checksum: " + commit.commitname.getId().getName() +
-                        "  Author: " + commit.commitname.getAuthorIdent().getName() +
-                        "  message: " + commit.commitname.getShortMessage());
-                //"Author: " + commit.getAuthorIdent().getName() + " <" + commit.getAuthorIdent().getEmailAddress() + ">"
-            }
-*/
+            //
 
+            //
 
             //dfs방식 구현
             ArrayList<textgraphAndCommit> forPrint = new ArrayList<>();
@@ -150,11 +147,23 @@ public class GitCommitHistory {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         if(refwindow == null){
-                            refwindow = showInfoWindow(index, forPrint.get(index));
+                            try {
+                                refwindow = showInfoWindow(git, index, forPrint.get(index));
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                         else{
                             refwindow.dispose();
-                            refwindow = showInfoWindow(index, forPrint.get(index));
+                            try {
+                                refwindow = showInfoWindow(git, index, forPrint.get(index));
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
                 });
@@ -201,7 +210,7 @@ public class GitCommitHistory {
                             label.setBounds(a,b,3,3);
                             framed.add(label);
                             */
-                            //ImageIcon img = new ImageIcon(GitCommitHistory.class.getClassLoader().getResource("image1.png"));
+                            //ImageIcon img = new ImageIcon(getClassLoader().getResource("image1.png"));
                             JLabel starlabel = new JLabel();
                             starlabel.setText("*");
                             starlabel.setBackground(Color.BLACK);
@@ -276,16 +285,16 @@ public class GitCommitHistory {
         }
         return false;
     }
-    private static JFrame showInfoWindow(int index, textgraphAndCommit TGCcommit) {
+    private static JFrame showInfoWindow(Git git, int index, textgraphAndCommit TGCcommit) throws GitAPIException, IOException {
         JFrame infoWindow = new JFrame(TGCcommit.commitname.getName() + TGCcommit.commitname.getShortMessage());
         infoWindow.setLayout(new FlowLayout());
-        infoWindow.setSize(300, 200);
+        infoWindow.setSize(600, 600);
 
         int tNumOfLabel = 3;
         JLabel infoLabel[] = new JLabel[tNumOfLabel];
-        infoLabel[0] = new JLabel("Name: " + TGCcommit.commitname.getAuthorIdent().getName());
-        infoLabel[1] = new JLabel("EmailAddress: " + TGCcommit.commitname.getAuthorIdent().getEmailAddress());
-        infoLabel[2] = new JLabel("CommitTime: " + TGCcommit.commitname.getCommitterIdent().getWhen());
+        infoLabel[0] = new JLabel("  //Name: " + TGCcommit.commitname.getAuthorIdent().getName());
+        infoLabel[1] = new JLabel("  //EmailAddress: " + TGCcommit.commitname.getAuthorIdent().getEmailAddress());
+        infoLabel[2] = new JLabel("  //CommitTime: " + TGCcommit.commitname.getCommitterIdent().getWhen());
 //infoLabel[3] = new JLabel("getAuthorIdent(): " + TGCcommit.commitname.getAuthorIdent().toString());
 
         for(int i=0;i<tNumOfLabel;i++){
@@ -293,6 +302,7 @@ public class GitCommitHistory {
             infoLabel[i].setBounds(30, (i+1) *20, 150,150);
             infoWindow.add(infoLabel[i]);
         }
+        diffCommit(infoWindow, git, TGCcommit);
         infoWindow.setVisible(true);
         return infoWindow;
     }
@@ -325,5 +335,50 @@ public class GitCommitHistory {
             num++;
         }
         return num;
+    }
+    private static void diffCommit(JFrame infoWindow, Git git, textgraphAndCommit TGCcommit) throws GitAPIException, IOException {
+        Repository repository = git.getRepository();
+        Iterable<RevCommit> commits_ = git.log().setMaxCount(1).call();
+        // 이전 커밋과의 차이를 출력
+        RevWalk revWalk = new RevWalk(repository);
+        if(TGCcommit.commitname.getParents().length == 0){
+            //이니셜 커밋이라고 말하기
+            System.out.println();
+            infoWindow.add(new JLabel("This is initial commit"));
+            //infoWindow.add(infoLabel[i]);
+        }
+        else {
+            ObjectId parentid = TGCcommit.commitname.getParent(0).getId();
+            //System.out.println(parentid);
+            RevCommit parentCommit = revWalk.parseCommit(parentid);
+
+            // 커밋들 간의 차이를 비교
+            try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+                diffFormatter.setRepository(repository);
+                List<DiffEntry> diffs = diffFormatter.scan(parentCommit.getTree(), TGCcommit.commitname.getTree());
+
+                // 수정사항 출력
+                for (DiffEntry diff : diffs) {
+
+                    infoWindow.add(new JLabel("----------------------------------------------------------------------------------------------------------"));
+                    infoWindow.add(new JLabel("// Change Type: " + diff.getChangeType()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+                    infoWindow.add(new JLabel("// Old Path: " + diff.getOldPath()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+                    infoWindow.add(new JLabel("// New Path: " + diff.getNewPath()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+
+/*
+                    System.out.println("Change Type: " + diff.getChangeType());
+                    System.out.println("Old Path: " + diff.getOldPath());
+                    System.out.println("New Path: " + diff.getNewPath());
+                    System.out.println();
+
+ */
+                }
+            }
+
+            revWalk.close();
+        }
     }
 }
