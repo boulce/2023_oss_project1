@@ -908,7 +908,6 @@ public class FileManager {//asdfasdf
             );
             toolBar.add(restore_missed);
 
-
             // toolBarForBranch에 위치한 버튼
 
             //6. 브랜치 생성 버튼
@@ -959,6 +958,8 @@ public class FileManager {//asdfasdf
                     }
             );
 
+            FileManager myFileManager = this;
+            // toolBarForBranch에 위치한 버튼들
             // merge 버튼
             merge_btn = new JButton("Merge");
             merge_btn.addActionListener(
@@ -968,16 +969,18 @@ public class FileManager {//asdfasdf
                         public void actionPerformed(ActionEvent e) {
                             if(branchList == null){
                                 try {
-                                    branchList = new BranchList(git, 3);
+                                    branchList = new BranchList(git, myFileManager);
                                 } catch (GitAPIException ex) {
+                                    throw new RuntimeException(ex);
+                                } catch (IOException ex) {
                                     throw new RuntimeException(ex);
                                 }
                             }
                             else{
                                 branchList.dispose();
                                 try {
-                                    branchList = new BranchList(git, 3);
-                                } catch (GitAPIException ex) {
+                                    branchList = new BranchList(git, myFileManager);
+                                } catch (GitAPIException | IOException ex) {
                                     throw new RuntimeException(ex);
                                 }
                             }
@@ -1343,7 +1346,7 @@ public class FileManager {//asdfasdf
     }
 
     //3. refresh 함수 구현
-    private void refresh() throws GitAPIException {
+    public void refresh() throws GitAPIException {
 
         try {
             boolean directory = currentFile.isDirectory();
