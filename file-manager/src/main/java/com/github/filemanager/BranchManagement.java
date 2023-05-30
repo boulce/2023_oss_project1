@@ -83,7 +83,7 @@ public class BranchManagement extends JFrame {
     }
 
     //5. Branch Checkout
-    public void BranchCheckout(Git git, String name) throws GitAPIException {
+  public void BranchCheckout(Git git, String name) throws GitAPIException {
 
 
         git.checkout().setName(name).call();
