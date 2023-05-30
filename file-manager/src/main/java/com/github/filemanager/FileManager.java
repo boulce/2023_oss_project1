@@ -946,10 +946,23 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            try {
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one you want to rename:", "Branch list",
+                                        0, 3, null, options, options[0]);
+                                if (selection != -1) {
+                                    String newName = JOptionPane.showInputDialog("Enter the new branch name");
+                                    branchManagement.BranchRename(git, options[selection], newName);
+                                }
 
+
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );
+
 
             //9. 브랜치 체크아웃 버튼
             branch_Checkout_btn = new JButton("Branch Checkout");
