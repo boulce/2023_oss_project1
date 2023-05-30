@@ -699,13 +699,6 @@ public class FileManager {//asdfasdf
             fileDetailsValues.add(size);
             fileDetailsLabels.add(new JLabel("Type", JLabel.TRAILING));
 
-            //브랜치 이름 추가 - git으로 관리되는 저장소일 때만
-          /*  if (GitUtilsForTrack.isGitRepository(selected_file)){
-                fileDetailsLabels.add(new JLabel("BranchName", JLabel.TRAILING));
-                branchName = new JLabel();
-                fileDetailsValues.add(branchName);
-            }
-          */
 
 
             int count = fileDetailsLabels.getComponentCount();
@@ -1024,18 +1017,6 @@ public class FileManager {//asdfasdf
             branchName = new JLabel("Branch Name : ");
             //여기에 브랜치 이름 받아오는 함수 실행
 
-//            File file = getGitRepository(currentPath);
-//            Repository repo;
-//            try {
-//                 repo = Git.open(file).getRepository();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//            Git git = new Git(repo);
-//
-//            branchManagement = new BranchManagement();
-//
-//            branchName.setText(branchManagement.BranchName(git, currentPath, repo));
 
 
             toolBarForBranch.add(branch_Create_btn);
@@ -1649,7 +1630,6 @@ public class FileManager {//asdfasdf
         path.setText(file.getPath());
         date.setText(new Date(file.lastModified()).toString());
         size.setText(file.length() + " bytes");
-        // branchName.setText("브랜치"); //현재 브랜치 이름 우측 하단 영역에 표시 -현재 깃으로 관리되고 있지 않으면?
 
 
         JFrame f = (JFrame) gui.getTopLevelAncestor();
@@ -1730,7 +1710,7 @@ public class FileManager {//asdfasdf
         private File[] files;
         private FileSystemView fileSystemView = FileSystemView.getFileSystemView();
         private String[] columns = {
-                "Icon", "File", "Path/name", "Size", "Last Modified", "Branch Name"};
+                "Icon", "File", "Path/name", "Size", "Last Modified"};
 
 
         FileTableModel() {
