@@ -1696,7 +1696,7 @@ public class FileManager {//asdfasdf
 
         branchManagement = new BranchManagement();
 
-        branchName.setText("  Branch: " + branchManagement.BranchName(git, currentPath, repo));
+        branchName.setText(branchManagement.BranchName(git, currentPath, repo));
     }
 
 
