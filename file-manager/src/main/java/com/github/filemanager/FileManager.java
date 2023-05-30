@@ -932,9 +932,12 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
 
+
+
                         }
                     }
             );
+
 
             //8. 브랜치 이름 변경 버튼
             branch_Rename_btn = new JButton("Branch Rename");
