@@ -41,6 +41,7 @@ import org.apache.commons.io.FileUtils;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
+import org.eclipse.jgit.api.errors.NotMergedException;
 
 import java.util.List;
 
@@ -941,10 +942,14 @@ public class FileManager {//asdfasdf
                                         0, 3, null, options, options[0]);
                                 if (selection != -1)
                                     branchManagement.BranchDelete(git, options[selection]);
-
-
-                            } catch (GitAPIException ex) {
-                                throw new RuntimeException(ex);
+                            }
+                            catch (NotMergedException ex) {
+                                    // Handle NotMergedException
+                                    String errorMessage = "Branch deletion failed. Branch has not been merged yet.";
+                                    JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                                }
+                            catch (GitAPIException exy) {
+                                throw new RuntimeException(exy);
                             }
 
                         }
@@ -1000,6 +1005,7 @@ public class FileManager {//asdfasdf
             );
 
             FileManager myFileManager = this;
+
             // toolBarForBranch에 위치한 버튼들
             //10. merge 버튼
             merge_btn = new JButton("Merge");
