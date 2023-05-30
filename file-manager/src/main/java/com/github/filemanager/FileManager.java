@@ -41,15 +41,22 @@ import org.apache.commons.io.FileUtils;
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.LineIterator;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
 import static com.github.filemanager.GitUtilsForTrack.*;
 
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import static com.github.filemanager.BranchManagement.*;
+import static com.github.filemanager.BranchMerge.*;
+import static com.github.filemanager.GitClone.*;
+import static com.github.filemanager.GitCommitHistory.*;
+
 
 
 /**
@@ -151,7 +158,6 @@ public class FileManager {//asdfasdf
     private JButton branch_Delete_btn;
     private JButton branch_Rename_btn;
     private JButton branch_Checkout_btn;
-
     private JButton merge_btn; // merge 버튼
 
     private JLabel fileName;
@@ -430,6 +436,13 @@ public class FileManager {//asdfasdf
                 }
 
             });
+
+
+
+
+
+
+
 
 /*
             //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
@@ -987,6 +1000,8 @@ public class FileManager {//asdfasdf
                     }
             );
 
+            FileManager myFileManager = this;
+            // toolBarForBranch에 위치한 버튼들
             //10. merge 버튼
             merge_btn = new JButton("Merge");
             merge_btn.addActionListener(
@@ -994,17 +1009,20 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if (branchList == null) {
+                            if(branchList == null){
                                 try {
-                                    branchList = new BranchList(git, 3);
+                                    branchList = new BranchList(git, myFileManager);
                                 } catch (GitAPIException ex) {
                                     throw new RuntimeException(ex);
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
                                 }
-                            } else {
+                            }
+                            else{
                                 branchList.dispose();
                                 try {
-                                    branchList = new BranchList(git, 3);
-                                } catch (GitAPIException ex) {
+                                    branchList = new BranchList(git, myFileManager);
+                                } catch (GitAPIException | IOException ex) {
                                     throw new RuntimeException(ex);
                                 }
                             }
@@ -1012,8 +1030,10 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            //11. Branch Name 텍스트 필드
 
+
+            //11. Branch Name 텍스트 필드
+//이거 꼭 필요? 체크
             branchName = new JLabel("Branch Name : ");
             //여기에 브랜치 이름 받아오는 함수 실행
 
@@ -1024,9 +1044,10 @@ public class FileManager {//asdfasdf
             toolBarForBranch.add(branch_Rename_btn);
             toolBarForBranch.add(branch_Checkout_btn);
             toolBarForBranch.addSeparator();
+            //merge 버튼
             toolBarForBranch.add(merge_btn);
 
-            //브랜치 이름 글자로 띄우기
+            //branch name 글자로 띄우기
             toolBarForBranch.add(branchName);
 
 
@@ -1053,8 +1074,8 @@ public class FileManager {//asdfasdf
         return gui;
     }
 
-
-    public Repository openGitRepository(String path) {
+//여기 꼭 필요? 체크
+    /*public Repository openGitRepository(String path) {
         try {
             FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
             Repository repository = repositoryBuilder.setGitDir(new File(path))
@@ -1066,7 +1087,7 @@ public class FileManager {//asdfasdf
             e.printStackTrace();
             return null;
         }
-    }
+    }*/
 
     public void showRootFile() {
         // ensure the main files are displayed
@@ -1387,7 +1408,7 @@ public class FileManager {//asdfasdf
     }
 
     //3. refresh 함수 구현
-    private void refresh() throws GitAPIException {
+    public void refresh() throws GitAPIException {
 
         try {
             boolean directory = currentFile.isDirectory();
@@ -1438,7 +1459,9 @@ public class FileManager {//asdfasdf
                 }
 
             } //removed의 while 끝
-        } else {
+        }
+
+        else {
             JOptionPane.showMessageDialog(null, "there are no Modified:deleted");
         }
 
@@ -2173,3 +2196,4 @@ class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         return label;
     }
 }
+

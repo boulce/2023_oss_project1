@@ -5,6 +5,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 public class BranchList extends JFrame {
-    public BranchList(Git git, int which_btn) throws GitAPIException {
+    public BranchList(Git git, FileManager fm) throws GitAPIException, IOException {
         super("Branch List");
         this.setSize(500, 500);
         this.setLocationRelativeTo(null);
@@ -39,10 +40,13 @@ public class BranchList extends JFrame {
         DefaultTableModel model = (DefaultTableModel) branch_list_table.getModel();
 
         List<Ref> call = git.branchList().call();
+        String current_branch_name = Repository.shortenRefName(git.getRepository().getFullBranch()); // 현재 checkout 된 브랜치 이름 저장
         for (Ref branch_info : call) {
-            System.out.println("Branch: " + branch_info + " " + branch_info.getName() + " " + branch_info.getObjectId().getName());
-            Object[] rowData = {branch_info.getName()}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
-            model.addRow(rowData);
+//                System.out.println("Branch: " + branch_info + " " + branch_info.getName() + " " + branch_info.getObjectId().getName());
+            String target_branch_name = Repository.shortenRefName(branch_info.getName());
+            if(target_branch_name.equals(current_branch_name)) continue; // 현재 브랜치와 같은 이름의 브랜치는 List에서 제외
+            Object[] rowData = {target_branch_name}; // 첫 번재 값은 아이콘(영헌이가 추가해야함), 두 번째는 파일 이름, // 세 번째는 파일의 절대 경로 (최상단 부모 깃 절대경로 + 파일의 상대경로)
+                model.addRow(rowData);
         }
 
         //branch_list_table.setEnabled(false);
@@ -68,30 +72,22 @@ public class BranchList extends JFrame {
                         // ex) 하빈이 같은 경우에는 선택한 값 BranchMerge로 가져가서 사용
 
 
-                        if(which_btn == 0){ // Delete
-
+                        boolean is_successful_merge;
+                        try {
+                            is_successful_merge = BranchMerge.branchMerge(git, (String) value);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (GitAPIException ex) {
+                            throw new RuntimeException(ex);
                         }
-                        else if(which_btn == 1){ // Rename
-
-                        }
-                        else if(which_btn == 2){ // Checkout
-
-                        }
-                        else if(which_btn == 3){ // Merge
-                            boolean is_successful_merge;
+                        if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
                             try {
-                                is_successful_merge = BranchMerge.branchMerge(git, (String) value);
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
+                                fm.refresh();
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
-                            if(is_successful_merge){ //merge가 정상적으로 수행되면 창 종료
-
-                            }
+                            dispose(); // 창 종료
                         }
-
-
                     }
                 }
         );
