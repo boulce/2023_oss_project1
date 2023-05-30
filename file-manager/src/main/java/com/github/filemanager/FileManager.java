@@ -42,6 +42,7 @@ import javax.swing.table.DefaultTableModel;
 import java.io.File;
 import java.io.IOException;
 import org.eclipse.jgit.api.errors.NotMergedException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
 
 import java.util.List;
 
@@ -971,10 +972,12 @@ public class FileManager {//asdfasdf
                                     String newName = JOptionPane.showInputDialog("Enter the new branch name");
                                     branchManagement.BranchRename(git, options[selection], newName);
                                 }
-
-
-                            } catch (GitAPIException ex) {
-                                throw new RuntimeException(ex);
+                            } catch (RefAlreadyExistsException ex) {
+                                // Handle RefAlreadyExistsException
+                                String errorMessage = "Branch rename failed. Branch name already exists.";
+                                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                            } catch (GitAPIException exy) {
+                                throw new RuntimeException(exy);
                             }
                         }
                     }
@@ -995,7 +998,6 @@ public class FileManager {//asdfasdf
                                     branchManagement.BranchCheckout(git, options[selection]);
                                     branchName.setText(options[selection]);
                                 }
-
 
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
