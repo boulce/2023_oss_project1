@@ -1032,9 +1032,8 @@ public class FileManager {//asdfasdf
 
 
             //11. Branch Name 텍스트 필드
-//이거 꼭 필요? 체크
             branchName = new JLabel("Branch Name : ");
-            //여기에 브랜치 이름 받아오는 함수 실행
+            //여기에 브랜치 이름 받아오거는 함수 실행
 
 
 
