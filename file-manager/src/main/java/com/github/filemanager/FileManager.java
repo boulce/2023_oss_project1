@@ -605,7 +605,9 @@ public class FileManager {//asdfasdf
                             setFileDetails((File) node.getUserObject());
 //
                             currentPath = (File) node.getUserObject();
+                            setBranchName();
                             // 특정 디렉토리를 누를 때마다 그 선택된 디렉토리 정보를 가져온다
+
                             //버튼 관리
                             File selected_file = (File) node.getUserObject();
                             if (GitUtilsForTrack.isGitRepository(selected_file)) { // 만약 git에 의해 관리되는 저장소라면
@@ -619,6 +621,7 @@ public class FileManager {//asdfasdf
                                 //브랜치 delete, rename, checkout은 항상 활성화 된 후, 브랜치 리스트에서 선택 후 진행된다.
                                 merge_btn.setEnabled(true); // branch_list_btn 활성화
 
+                                branchName.setEnabled(true);
 
 
                                 try {
@@ -634,6 +637,8 @@ public class FileManager {//asdfasdf
 
                                 branch_Create_btn.setEnabled(false); // Branch create 버튼 비활성화
                                 merge_btn.setEnabled(false); // branch_list_btn 비활성화
+                                branchName.setEnabled(false);
+
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -936,7 +941,7 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            //8. 브랜치 이름 변경 버튼
+            //8.브랜치 이름 변경 버튼
             branch_Rename_btn = new JButton("Branch Rename");
             branch_Rename_btn.addActionListener(
 
@@ -960,7 +965,7 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            // merge 버튼
+            // 10. merge 버튼
             merge_btn = new JButton("Merge");
             merge_btn.addActionListener(
 
@@ -987,6 +992,10 @@ public class FileManager {//asdfasdf
                     }
             );
 
+            //11. Branch Name 텍스트 필드
+
+            branchName = new JLabel("Branch Name : ");
+
 
             toolBarForBranch.add(branch_Create_btn);
             toolBarForBranch.add(branch_Delete_btn);
@@ -995,9 +1004,8 @@ public class FileManager {//asdfasdf
             toolBarForBranch.addSeparator();
             toolBarForBranch.add(merge_btn);
 
-
-
             //브랜치 이름 글자로 띄우기
+            toolBarForBranch.add(branchName);
 
             JPanel fileView = new JPanel(new BorderLayout(3, 3)); //fileView는 우하단 회색영역 전체를 말한다.
 
@@ -1587,7 +1595,7 @@ public class FileManager {//asdfasdf
         path.setText(file.getPath());
         date.setText(new Date(file.lastModified()).toString());
         size.setText(file.length() + " bytes");
-        branchName.setText("브랜치"); //현재 브랜치 이름 우측 하단 영역에 표시 -현재 깃으로 관리되고 있지 않으면?
+
 
 
         JFrame f = (JFrame) gui.getTopLevelAncestor();
@@ -1620,6 +1628,8 @@ public class FileManager {//asdfasdf
                         FileManager fileManager = new FileManager();
                         f.setContentPane(fileManager.getGui());
 
+                        fileManager.setBranchName();
+
                         try {
                             URL urlBig = fileManager.getClass().getResource("fm-icon-32x32.png");
                             URL urlSmall = fileManager.getClass().getResource("fm-icon-16x16.png");
@@ -1639,6 +1649,22 @@ public class FileManager {//asdfasdf
                     }
                 });
     }
+
+    private void setBranchName() {
+        File file = getGitRepository(currentPath);
+        Repository repo;
+        try {
+            repo = Git.open(file).getRepository();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Git git = new Git(repo);
+
+        branchManagement = new BranchManagement();
+
+        branchName.setText(branchManagement.BranchName(git, currentPath, repo));
+    }
+
 
 
     /**
