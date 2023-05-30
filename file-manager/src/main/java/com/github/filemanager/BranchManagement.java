@@ -69,8 +69,6 @@ public class BranchManagement extends JFrame {
     public void BranchDelete(Git git, String name) throws GitAPIException {
 
         git.branchDelete().setBranchNames(name).call();
-//Caused by: org.eclipse.jgit.api.errors.NotMergedException: Branch was not deleted as it has not been merged yet; use the force option to delete it anyway
-        //이 예외 처리
     }
 
     //4. Branch Rename
