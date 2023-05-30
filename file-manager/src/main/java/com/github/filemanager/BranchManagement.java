@@ -43,24 +43,15 @@ public class BranchManagement  extends JFrame{
 
     //3. Branch Delete
     public void BranchDelete(Git git, String name) throws GitAPIException {
-       //예외처리 추가하기 - 삭제하려는 브랜치가 머지되지 않은 경우, 삭제할 수 없다는 오류 팝업
-            git.branchDelete().setBranchNames(name).call();
 
-        }
+        git.branchDelete().setBranchNames(name).call();
+
     }
-
 
 
     //4. Branch Rename
-    public void BranchRename(Git git, String oldName, String newName) throws GitAPIException {
-
-
-        git.branchRename().setOldName(oldName).setNewName(newName).call();
-
-    }
-
 
     //5. Branch Checkout
 
 
-
+}

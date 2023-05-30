@@ -955,10 +955,23 @@ public class FileManager {//asdfasdf
                     new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
+                            try {
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                int selection = JOptionPane.showOptionDialog(null, "Select one you want to checkout:", "Branch list",
+                                        0, 3, null, options, options[0]);
+                                if (selection != -1) {
+                                    branchManagement.BranchCheckout(git, options[selection]);
+                                    branchName.setText(options[selection]);
+                                }
 
+
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                     }
             );
+
 
             // merge 버튼
             merge_btn = new JButton("Merge");
