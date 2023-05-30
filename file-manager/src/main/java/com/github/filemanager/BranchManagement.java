@@ -50,7 +50,15 @@ public class BranchManagement  extends JFrame{
     }
 
 
+
     //4. Branch Rename
+    public void BranchRename(Git git, String oldName, String newName) throws GitAPIException {
+
+
+        git.branchRename().setOldName(oldName).setNewName(newName).call();
+
+    }
+
 
     //5. Branch Checkout
 
