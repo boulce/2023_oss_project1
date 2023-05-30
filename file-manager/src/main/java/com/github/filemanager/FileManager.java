@@ -922,7 +922,7 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            //7. 브랜치 삭제 버튼
+            //7. Branch Delete 버튼
             branch_Delete_btn = new JButton("Branch Delete");
             branch_Delete_btn.addActionListener(
 
@@ -946,7 +946,7 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            //8. 브랜치 이름 변경 버튼
+            //8. Branch Rename 버튼
             branch_Rename_btn = new JButton("Branch Rename");
             branch_Rename_btn.addActionListener(
 
@@ -970,7 +970,7 @@ public class FileManager {//asdfasdf
                     }
             );
 
-            //9. 브랜치 체크아웃 버튼
+            //9. Branch Checkout 버튼
             branch_Checkout_btn = new JButton("Branch Checkout");
             branch_Checkout_btn.addActionListener(
 
