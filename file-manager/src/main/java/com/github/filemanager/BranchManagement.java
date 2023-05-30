@@ -74,10 +74,7 @@ public class BranchManagement extends JFrame {
     //4. Branch Rename
     public void BranchRename(Git git, String oldName, String newName) throws GitAPIException {
 
-
         git.branchRename().setOldName(oldName).setNewName(newName).call();
-//Caused by: org.eclipse.jgit.api.errors.RefAlreadyExistsException: Ref refs/heads/eee already exists
-        //이 예외 처리
     }
 
     //5. Branch Checkout
