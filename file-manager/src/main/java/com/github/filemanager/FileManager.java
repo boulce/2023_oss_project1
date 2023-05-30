@@ -609,7 +609,9 @@ public class FileManager {//asdfasdf
                                 restore_missed.setEnabled(true);
 
                                 branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
-                                //브랜치 delete, rename, checkout은 항상 활성화 된 후, 브랜치 리스트에서 선택 후 진행된다.
+                                branch_Delete_btn.setEnabled(true);  //Branch delete 버튼 활성화
+                                branch_Rename_btn.setEnabled(true);  //Branch rename 버튼 활성화
+                                branch_Checkout_btn.setEnabled(true);//Branch checkout 버튼 활성화
                                 merge_btn.setEnabled(true); // branch_list_btn 활성화
 
                                 branchName.setEnabled(true);
@@ -626,6 +628,9 @@ public class FileManager {//asdfasdf
                                 restore_missed.setEnabled(false);
 
                                 branch_Create_btn.setEnabled(false); // Branch create 버튼 비활성화
+                                branch_Delete_btn.setEnabled(false);  //Branch delete 버튼 비활성화
+                                branch_Rename_btn.setEnabled(false);  //Branch rename 버튼 비활성화
+                                branch_Checkout_btn.setEnabled(false);//Branch checkout 버튼 비활성화
                                 merge_btn.setEnabled(false); // branch_list_btn 비활성화
                                 branchName.setEnabled(false);
                             }
@@ -1068,20 +1073,6 @@ public class FileManager {//asdfasdf
         return gui;
     }
 
-//여기 꼭 필요? 체크
-    /*public Repository openGitRepository(String path) {
-        try {
-            FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
-            Repository repository = repositoryBuilder.setGitDir(new File(path))
-                    .readEnvironment()
-                    .findGitDir()
-                    .build();
-            return repository;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }*/
 
     public void showRootFile() {
         // ensure the main files are displayed
