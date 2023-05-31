@@ -13,12 +13,18 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.*;
 
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import java.io.IOException;
 import java.util.List;
+
 
 
 class branchAndCommit{
@@ -44,6 +50,8 @@ public class GitCommitHistory {
     static int count_labelssSize=0;
     static int numOfDownClik=0;
     //int count_labelssSize=0;
+    static JFrame refwindow =null;
+
 
     public static void showCommitHistory(Git git) throws GitAPIException {
 
@@ -51,7 +59,7 @@ public class GitCommitHistory {
             //현재 브랜치 찾기.
             Repository repository = git.getRepository();
             String branchName = repository.getBranch();
-            System.out.println("Current Branch: " + branchName);
+            //System.out.println("Current Branch: " + branchName);
 
             // 모든 브랜치 가져오기
             List<Ref> branches = git.branchList().call();
@@ -63,7 +71,7 @@ public class GitCommitHistory {
                 Iterable<RevCommit> branchCommits = git.log().add(branch.getObjectId()).call();
                 //같은 브랜치인지 비교
                 if(branchName.equals(branch.getName().substring(branch.getName().lastIndexOf('/') + 1))){
-                    System.out.println(branch.getName());
+                    //System.out.println(branch.getName());
                     for (RevCommit commit : branchCommits) {
                         numOfCommits++;
                         commits.add(new branchAndCommit(branch.getName(), commit));
@@ -71,17 +79,9 @@ public class GitCommitHistory {
                 }
             }
 
-            // git log 출력
-            for (branchAndCommit commit : commits) {
-                System.out.println(
-                        "-------------------------------------------" +
-                        "  Checksum: " + commit.commitname.getId().getName() +
-                        "  Author: " + commit.commitname.getAuthorIdent().getName() +
-                        "  message: " + commit.commitname.getShortMessage());
-                //"Author: " + commit.getAuthorIdent().getName() + " <" + commit.getAuthorIdent().getEmailAddress() + ">"
-            }
+            //
 
-
+            //
 
             //dfs방식 구현
             ArrayList<textgraphAndCommit> forPrint = new ArrayList<>();
@@ -116,7 +116,7 @@ public class GitCommitHistory {
             }
 
             for(textgraphAndCommit forprint_ : forPrint){
-                System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
+                //System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
             }
 
             JFrame framed = new JFrame("Image Click Example");
@@ -128,21 +128,43 @@ public class GitCommitHistory {
             // 이미지 로드
             int countfortextFields =0;
             for(textgraphAndCommit forprint_ : forPrint){
-                textFields[countfortextFields] = new JButton(forprint_.commitname.getShortMessage());
+                textFields[countfortextFields] = new JButton(forprint_.commitname.getAuthorIdent().getName() + " : " + forprint_.commitname.getShortMessage());
                 countfortextFields++;
             }
 
-
+            /*
+            for(textgraphAndCommit forprint_ : forPrint){
+                System.out.println(forprint_.line + forprint_.commitname.getShortMessage());
+            }
+*/
             // 이미지 레이블 생성 및 설정
             for (int i = 0; i < forPrint.size(); i++) {
-                textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150,50);
+                textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150 * 3,50);
                 //labels[i].setBounds(100, (i +                //labels[i] = new JLabel(textFields[i]); 1) * 30, images[i].getIconWidth(), images[i].getIconHeight());
 
                 final int index = i; // MouseAdapter에서 참조하기 위해 인덱스를 final 변수로 설정
                 textFields[i].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        showInfoWindow(index);
+                        if(refwindow == null){
+                            try {
+                                refwindow = showInfoWindow(git, index, forPrint.get(index));
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                        else{
+                            refwindow.dispose();
+                            try {
+                                refwindow = showInfoWindow(git, index, forPrint.get(index));
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
                     }
                 });
                 framed.add(textFields[i]);
@@ -158,7 +180,8 @@ public class GitCommitHistory {
                 }
             }
             */
-            JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * 20];
+            int tNumOfImages = 200;
+            JLabel[] labelss = new JLabel[forPrint.size() * forPrint.size() * tNumOfImages];
 
             count_labelssSize=0;
             //선 긋기. //이미지로 구현
@@ -166,26 +189,34 @@ public class GitCommitHistory {
                 for(int j=i;j<forPrint.size();j++){
                     if(AisParentOfB(forPrint.get(j),forPrint.get(i))){
                         //System.out.println(j + "는 부모다 " + i + "의");
-                        int startX = (forPrint.get(i).line+1)*100 +50 ;
-                        int startY = (i+1)*70 +50 ;
-                        int endX = (forPrint.get(j).line+1)*100+50 ;
-                        int endY = (j+1)*70+50 ;
+                        int startX = (forPrint.get(i).line+1)*100 + 75 ;
+                        int startY = (i+1)*70 +25 ;
+                        int endX = (forPrint.get(j).line+1)*100+ 75 ;
+                        int endY = (j+1)*70+25 ;
 
                         int difx=endX-startX;
                         int dify=endY-startY;
 
                         //이미지로 선 긋자.
-                        int a=startX;
-                        int b=startY;
-                        for(;b<endY;b+=(dify/20)){
-                            a+=(difx/20);
+                        float a=startX;
+                        float b=startY;
+                        int c;
+                        for(c=0;c< tNumOfImages;c++){
+                            a = startX +  ((c * difx)/tNumOfImages);
+                            b = startY +  ((c * dify)/tNumOfImages);
+
                             /*
                             JLabel label = new JLabel(new ImageIcon("image1.png"));
                             label.setBounds(a,b,3,3);
                             framed.add(label);
                             */
-                            labelss[count_labelssSize] = new JLabel(new ImageIcon("image1.png"));
-                            labelss[count_labelssSize].setBounds(a,b,3,3);
+                            //ImageIcon img = new ImageIcon(getClassLoader().getResource("image1.png"));
+                            JLabel starlabel = new JLabel();
+                            starlabel.setText("*");
+                            starlabel.setBackground(Color.BLACK);
+                            starlabel.setOpaque(true);
+                            labelss[count_labelssSize] = starlabel;//new ImageIcon(imagePath));
+                            labelss[count_labelssSize].setBounds((int)a,(int)b,3,3);
                             framed.add(labelss[count_labelssSize]);
 
                             count_labelssSize++;
@@ -230,7 +261,7 @@ public class GitCommitHistory {
             framed.add(downMoveButton);
 
 
-            framed.setSize(500, 800);
+            framed.setSize(1500, 800);
             framed.setVisible(true);
             framed.addWindowListener(new WindowAdapter() {
                 @Override
@@ -254,15 +285,26 @@ public class GitCommitHistory {
         }
         return false;
     }
-    private static void showInfoWindow(int index) {
-        JFrame infoWindow = new JFrame("Image Info Window");
+    private static JFrame showInfoWindow(Git git, int index, textgraphAndCommit TGCcommit) throws GitAPIException, IOException {
+        JFrame infoWindow = new JFrame(TGCcommit.commitname.getName() + TGCcommit.commitname.getShortMessage());
         infoWindow.setLayout(new FlowLayout());
-        infoWindow.setSize(300, 200);
+        infoWindow.setSize(600, 600);
 
-        JLabel infoLabel = new JLabel("Selected Image: " + (index + 1));
-        infoWindow.add(infoLabel);
+        int tNumOfLabel = 3;
+        JLabel infoLabel[] = new JLabel[tNumOfLabel];
+        infoLabel[0] = new JLabel("  //Name: " + TGCcommit.commitname.getAuthorIdent().getName());
+        infoLabel[1] = new JLabel("  //EmailAddress: " + TGCcommit.commitname.getAuthorIdent().getEmailAddress());
+        infoLabel[2] = new JLabel("  //CommitTime: " + TGCcommit.commitname.getCommitterIdent().getWhen());
+//infoLabel[3] = new JLabel("getAuthorIdent(): " + TGCcommit.commitname.getAuthorIdent().toString());
 
+        for(int i=0;i<tNumOfLabel;i++){
+            //textFields[i].setBounds((forPrint.get(i).line+1)*100, (i+1)*70,150 * 3,50);
+            infoLabel[i].setBounds(30, (i+1) *20, 150,150);
+            infoWindow.add(infoLabel[i]);
+        }
+        diffCommit(infoWindow, git, TGCcommit);
         infoWindow.setVisible(true);
+        return infoWindow;
     }
 
     private static int getCangoCount(ArrayList<String> visitedCS, RevCommit[] nodes){
@@ -293,5 +335,50 @@ public class GitCommitHistory {
             num++;
         }
         return num;
+    }
+    private static void diffCommit(JFrame infoWindow, Git git, textgraphAndCommit TGCcommit) throws GitAPIException, IOException {
+        Repository repository = git.getRepository();
+        Iterable<RevCommit> commits_ = git.log().setMaxCount(1).call();
+        // 이전 커밋과의 차이를 출력
+        RevWalk revWalk = new RevWalk(repository);
+        if(TGCcommit.commitname.getParents().length == 0){
+            //이니셜 커밋이라고 말하기
+            System.out.println();
+            infoWindow.add(new JLabel("This is initial commit"));
+            //infoWindow.add(infoLabel[i]);
+        }
+        else {
+            ObjectId parentid = TGCcommit.commitname.getParent(0).getId();
+            //System.out.println(parentid);
+            RevCommit parentCommit = revWalk.parseCommit(parentid);
+
+            // 커밋들 간의 차이를 비교
+            try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+                diffFormatter.setRepository(repository);
+                List<DiffEntry> diffs = diffFormatter.scan(parentCommit.getTree(), TGCcommit.commitname.getTree());
+
+                // 수정사항 출력
+                for (DiffEntry diff : diffs) {
+
+                    infoWindow.add(new JLabel("----------------------------------------------------------------------------------------------------------"));
+                    infoWindow.add(new JLabel("// Change Type: " + diff.getChangeType()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+                    infoWindow.add(new JLabel("// Old Path: " + diff.getOldPath()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+                    infoWindow.add(new JLabel("// New Path: " + diff.getNewPath()));
+                    infoWindow.add(new JLabel("                                                                                                           "));
+
+/*
+                    System.out.println("Change Type: " + diff.getChangeType());
+                    System.out.println("Old Path: " + diff.getOldPath());
+                    System.out.println("New Path: " + diff.getNewPath());
+                    System.out.println();
+
+ */
+                }
+            }
+
+            revWalk.close();
+        }
     }
 }
