@@ -1508,6 +1508,23 @@ public class FileManager {
         new GitClone(localPath);
         git=Git.init().setDirectory(currentPath).call(); //refresh를 구현하기위해 FileManager의 attribute인 git을 초기화할 필요가 있음, 로직상 git clone은 non-git폴더를 왼쪽 트리에서 고르면서 시작되므로 git이 초기화되어있지 않음. 임시로 초기화  곽수정
         refresh();
+        setBranchName();
+        gitinit.setEnabled(false); // git init과
+        gitcommit.setEnabled(true); // git commit 버튼을 disable하고
+        refresh.setEnabled(true);
+        restore_missed.setEnabled(true);
+
+
+        branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
+        branch_Delete_btn.setEnabled(true);  //Branch delete 버튼 활성화
+        branch_Rename_btn.setEnabled(true);  //Branch rename 버튼 활성화
+        branch_Checkout_btn.setEnabled(true);//Branch checkout 버튼 활성화
+        merge_btn.setEnabled(true); // branch_list_btn 활성화
+
+        branchName.setEnabled(true);
+
+        git_clone.setEnabled(true);
+        gitCommitHistory.setEnabled(true);
     }
 
 
