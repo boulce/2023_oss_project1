@@ -26,6 +26,7 @@ package com.github.filemanager;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 import javax.imageio.ImageIO;
@@ -52,6 +53,12 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
 import static com.github.filemanager.GitUtilsForTrack.*;
+
+
+import static com.github.filemanager.BranchManagement.*;
+import static com.github.filemanager.BranchMerge.*;
+import static com.github.filemanager.GitClone.*;
+import static com.github.filemanager.GitCommitHistory.*;
 
 
 
@@ -84,7 +91,7 @@ import static com.github.filemanager.GitUtilsForTrack.*;
  */
 
 
-public class FileManager {//asdfasdf
+public class FileManager {
 
     /**
      * Title of the application
@@ -155,6 +162,10 @@ public class FileManager {//asdfasdf
     private JButton branch_Rename_btn;
     private JButton branch_Checkout_btn;
     private JButton merge_btn; // merge 버튼
+
+    private JButton git_clone; //테스트용 버튼 곽수정
+    private JButton gitCommitHistory;
+
 
     private JLabel fileName;
     private JTextField path;
@@ -437,39 +448,6 @@ public class FileManager {//asdfasdf
 
 
 
-
-
-
-/*
-            //Removed를 위한 popup menu removed는 commit상태에서 git rm을 실행한 결과이고, deleted가 staged 된 상태이다.
-            JPopupMenu popupMenuRemoved = new JPopupMenu();
-            JMenuItem gitremoved= new JMenuItem("git rm for removed");
-
-            popupMenuStaged.add(gitremoved);
-
-            table.setComponentPopupMenu(popupMenuRemoved);
-            gitremoved.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showMessageDialog(null, "git rm'ed file, what should i do");
-
-
-                    Status status = null;
-                    try {
-                        status = git.status().call();
-                    } catch (GitAPIException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    fileTableModel.setGit(status, currentPath);
-                    table.repaint();
-                }
-
-
-            });
-
-*/
-
-
             //우클릭 처리 추가
             mouseAdapter =
                     new MouseAdapter() {
@@ -587,6 +565,11 @@ public class FileManager {//asdfasdf
                     };
             table.addMouseListener(mouseAdapter);
 
+
+            ///////////////////////////////////////////////////////////////////////
+
+
+            ///////////////////////////////////////////////////////////////////////
             // the File tree
             DefaultMutableTreeNode root = new DefaultMutableTreeNode();
             treeModel = new DefaultTreeModel(root);
@@ -598,7 +581,6 @@ public class FileManager {//asdfasdf
                             DefaultMutableTreeNode node =
                                     (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
                             setFileDetails((File) node.getUserObject());
-//
                             currentPath = (File) node.getUserObject();
                             setBranchName();
                             // 특정 디렉토리를 누를 때마다 그 선택된 디렉토리 정보를 가져온다
@@ -610,6 +592,7 @@ public class FileManager {//asdfasdf
                                 refresh.setEnabled(true);
                                 restore_missed.setEnabled(true);
 
+
                                 branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
                                 branch_Delete_btn.setEnabled(true);  //Branch delete 버튼 활성화
                                 branch_Rename_btn.setEnabled(true);  //Branch rename 버튼 활성화
@@ -618,6 +601,8 @@ public class FileManager {//asdfasdf
 
                                 branchName.setEnabled(true);
 
+                                git_clone.setEnabled(true); //곽수정
+                                gitCommitHistory.setEnabled(true);
                                 try {
                                     git = Git.open(getGitRepository(selected_file)); // git 저장소를 연다.
                                 } catch (IOException e) {
@@ -635,6 +620,8 @@ public class FileManager {//asdfasdf
                                 branch_Checkout_btn.setEnabled(false);//Branch checkout 버튼 비활성화
                                 merge_btn.setEnabled(false); // branch_list_btn 비활성화
                                 branchName.setEnabled(false);
+                                git_clone.setEnabled(true); //곽수정
+                                gitCommitHistory.setEnabled(false);
                             }
 
                             // 디렉토리가 깃에의해 관리되고 있는지 판단
@@ -832,6 +819,7 @@ public class FileManager {//asdfasdf
                                 restore_missed.setEnabled(true);
                                 merge_btn.setEnabled(true);
 
+                                gitCommitHistory.setEnabled(true);
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
@@ -912,7 +900,53 @@ public class FileManager {//asdfasdf
 
             // toolBarForBranch에 위치한 버튼
 
-            //6. Branch Create 버튼
+            //5. git clone기능, 테스트용도 곽수정
+
+
+            git_clone = new JButton("git clone");
+            git_clone.addActionListener(
+
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+
+
+                            try {
+                                gitclone(String.valueOf(currentPath));
+                            } catch (GitAPIException | IOException ex) {
+                                JOptionPane.showMessageDialog(null, "에러 발생! : "+ex.getMessage());
+                                // throw new RuntimeException(ex);
+                            }
+
+                        }
+                    }
+
+            );
+            toolBar.add(git_clone);
+
+
+///////////////////////////////////////git history 보여주는 부분
+            gitCommitHistory = new JButton("Git Commit History");
+            gitCommitHistory.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                showCommitHistory(git);
+                                //showCommitHistory_ver2();
+                            } catch (GitAPIException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+
+            );
+            toolBar.add(gitCommitHistory);
+
+            ///////////////////////////////////////
+
+
+//6. Branch Create 버튼
             branch_Create_btn = new JButton("Branch Create");
             branch_Create_btn.addActionListener(
 
@@ -938,7 +972,7 @@ public class FileManager {//asdfasdf
                         public void actionPerformed(ActionEvent e) {
 
                             try {
-                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText(), false);
                                 int selection = JOptionPane.showOptionDialog(null, "Select one you want to delete:", "Branch list",
                                         0, 3, null, options, options[0]);
                                 if (selection != -1)
@@ -965,7 +999,7 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             try {
-                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText(), true);
                                 int selection = JOptionPane.showOptionDialog(null, "Select one you want to rename:", "Branch list",
                                         0, 3, null, options, options[0]);
                                 if (selection != -1) {
@@ -991,7 +1025,7 @@ public class FileManager {//asdfasdf
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             try {
-                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText());
+                                String[] options = branchManagement.getBranchNamesList(git, branchName.getText(), false);
                                 int selection = JOptionPane.showOptionDialog(null, "Select one you want to checkout:", "Branch list",
                                         0, 3, null, options, options[0]);
                                 if (selection != -1) {
@@ -1041,7 +1075,8 @@ public class FileManager {//asdfasdf
 
 
             //11. Branch Name 텍스트 필드
-            branchName = new JLabel("Branch Name : ");
+            JLabel branchLabel = new JLabel(" Current Branch: ");
+            branchName = new JLabel("");
             //여기에 브랜치 이름 받아오거는 함수 실행
 
 
@@ -1055,6 +1090,7 @@ public class FileManager {//asdfasdf
             toolBarForBranch.add(merge_btn);
 
             //branch name 글자로 띄우기
+            toolBarForBranch.add(branchLabel);
             toolBarForBranch.add(branchName);
 
 
@@ -1462,6 +1498,19 @@ public class FileManager {//asdfasdf
 
     }
 
+    //5. git clone 테스트용도 곽수정
+
+    private void gitclone(String localPath) throws GitAPIException, IOException {
+
+
+
+        new GitClone(localPath);
+        git=Git.init().setDirectory(currentPath).call(); //refresh를 구현하기위해 FileManager의 attribute인 git을 초기화할 필요가 있음, 로직상 git clone은 non-git폴더를 왼쪽 트리에서 고르면서 시작되므로 git이 초기화되어있지 않음. 임시로 초기화  곽수정
+        refresh();
+    }
+
+
+
 
     private void newFile() {
         if (currentFile == null) {
@@ -1701,18 +1750,21 @@ public class FileManager {//asdfasdf
     }
 
     private void setBranchName() {
-        File file = getGitRepository(currentPath);
-        Repository repo;
-        try {
-            repo = Git.open(file).getRepository();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(isGitRepository(currentPath)){
+            File file = getGitRepository(currentPath);
+            Repository repo;
+            try {
+
+                repo = Git.open(file).getRepository();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Git git = new Git(repo);
+
+            branchManagement = new BranchManagement();
+
+            branchName.setText(branchManagement.BranchName(git, currentPath, repo));
         }
-        Git git = new Git(repo);
-
-        branchManagement = new BranchManagement();
-
-        branchName.setText(branchManagement.BranchName(git, currentPath, repo));
     }
 
 
@@ -2144,7 +2196,7 @@ public class FileManager {//asdfasdf
         }
     }
 
-}
+} //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
 
 
 /**

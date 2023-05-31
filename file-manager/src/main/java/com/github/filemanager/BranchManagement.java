@@ -50,14 +50,23 @@ public class BranchManagement extends JFrame {
     }
 
 
-    public String[] getBranchNamesList(Git git, String current_branch) throws GitAPIException {
-        String[] branchNames = new String[git.branchList().call().size() - 1];
+    public String[] getBranchNamesList(Git git, String current_branch, boolean is_branch_rename) throws GitAPIException {
+        String[] branchNames;
+
+        if(!is_branch_rename)
+            branchNames = new String[git.branchList().call().size()-1];
+        else
+            branchNames = new String[git.branchList().call().size()];
         int i = 0;
 
         for (Ref ref : git.branchList().call()) {
             // refs/head/actual_name
             String name = ref.getName().split("/")[2];
-            if (!current_branch.equals(name))
+            if(!is_branch_rename) {
+                if (!current_branch.equals(name))
+                    branchNames[i++] = ref.getName().split("/")[2];
+            }
+            else
                 branchNames[i++] = ref.getName().split("/")[2];
         }
 
