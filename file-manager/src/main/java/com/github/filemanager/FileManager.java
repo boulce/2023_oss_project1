@@ -1783,6 +1783,9 @@ public class FileManager {
 
             branchName.setText(branchManagement.BranchName(git, currentPath, repo));
         }
+        else{
+            branchName.setText("");
+        }
     }
 
 
