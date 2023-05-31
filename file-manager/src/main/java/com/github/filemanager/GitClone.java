@@ -8,6 +8,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import javax.swing.*;
 import java.io.*;
+import java.net.URL;
 import java.util.HashMap;
 import java.io.BufferedReader;
 
@@ -31,6 +32,15 @@ public class GitClone {
 
 
     public void ReadWriteSetting(String gitID, String accessToken, String settingpath) throws IOException {
+
+        ;
+
+        File file = new File(settingpath); // File객체 생성
+        if(!file.exists()){ // 파일이 존재하지 않으면
+            file.createNewFile(); // 신규생성
+        }
+
+
 
         BufferedReader br=new BufferedReader(new FileReader(settingpath));
         StringBuilder sb=new StringBuilder();
@@ -77,7 +87,10 @@ public class GitClone {
     }
 
     public void cloneRepoPrivate(String localPath) throws GitAPIException, IOException {
-        String settingpath=OsUtils.getAbsolutePathByOs(System.getProperty("user.dir")+"\\src\\main\\resources\\settings.txt");
+
+
+        String settingpath=OsUtils.getAbsolutePathByOs(new File("").getAbsolutePath()+"\\settings.txt");
+
 
 
         try {
@@ -96,7 +109,7 @@ public class GitClone {
 // id ,token 입력 창
 
 
-            //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
+
             String inputID=JOptionPane.showInputDialog("git username 또는 로그인에 필요한 email을 입력하세요");
             String inputToken=JOptionPane.showInputDialog("git의 AccessToken을 입력하세요");
             this.gitID=inputID;
