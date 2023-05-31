@@ -997,6 +997,7 @@ public class FileManager {//asdfasdf
                                 if (selection != -1) {
                                     branchManagement.BranchCheckout(git, options[selection]);
                                     branchName.setText(options[selection]);
+                                    refresh(); // Checkout 버튼 누르면 현재 브랜치에 맞게 브라우저 refresh
                                 }
 
                             } catch (GitAPIException ex) {
