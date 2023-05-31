@@ -1005,6 +1005,7 @@ public class FileManager {
                                 if (selection != -1) {
                                     String newName = JOptionPane.showInputDialog("Enter the new branch name");
                                     branchManagement.BranchRename(git, options[selection], newName);
+                                    setBranchName();
                                 }
                             } catch (RefAlreadyExistsException ex) {
                                 // Handle RefAlreadyExistsException
