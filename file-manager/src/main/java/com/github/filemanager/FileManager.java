@@ -819,7 +819,17 @@ public class FileManager {
                                 restore_missed.setEnabled(true);
                                 merge_btn.setEnabled(true);
 
+                                branch_Create_btn.setEnabled(true);  //Branch create 버튼 활성화
+                                branch_Delete_btn.setEnabled(true);  //Branch delete 버튼 활성화
+                                branch_Rename_btn.setEnabled(true);  //Branch rename 버튼 활성화
+                                branch_Checkout_btn.setEnabled(true);//Branch checkout 버튼 활성화
+
                                 gitCommitHistory.setEnabled(true);
+
+                                setBranchName();
+                                branchName.setEnabled(true);
+                                git_clone.setEnabled(true);
+
                             } catch (GitAPIException ex) {
                                 throw new RuntimeException(ex);
                             }
