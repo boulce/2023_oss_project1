@@ -318,7 +318,6 @@ public class GitCommitHistory {
     }
     private static void addCommitForPrint(ArrayList<textgraphAndCommit> forPrintList,RevCommit node,int lineNum) {
         //forPrintList.add(new textgraphAndCommit("123",node));
-
         int insertindex = calIndex(forPrintList, node, lineNum);
 
         forPrintList.add(insertindex, new textgraphAndCommit(lineNum ,node));//해당 줄
@@ -359,14 +358,13 @@ public class GitCommitHistory {
 
                 // 수정사항 출력
                 for (DiffEntry diff : diffs) {
-
                     infoWindow.add(new JLabel("----------------------------------------------------------------------------------------------------------"));
                     infoWindow.add(new JLabel("// Change Type: " + diff.getChangeType()));
-                    infoWindow.add(new JLabel("                                                                                                           "));
+                    //infoWindow.add(new JLabel("                                                                                                           "));
                     infoWindow.add(new JLabel("// Old Path: " + diff.getOldPath()));
-                    infoWindow.add(new JLabel("                                                                                                           "));
+                    //infoWindow.add(new JLabel("                                                                                                           "));
                     infoWindow.add(new JLabel("// New Path: " + diff.getNewPath()));
-                    infoWindow.add(new JLabel("                                                                                                           "));
+                    //infoWindow.add(new JLabel("                                                                                                           "));
 
 /*
                     System.out.println("Change Type: " + diff.getChangeType());
