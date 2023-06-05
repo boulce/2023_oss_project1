@@ -1,61 +1,44 @@
 # 2023_oss_project1
 
-오픈소스 소프트웨어 프로젝트 첫번째 과제로, GUI를 통한 파일 관리 시스템을 만들었습니다.
-
-파일 매니저 https://github.com/javadev/file-manager 를 이용하였습니다. 
-
-As the first task of the open source software project, we created a file management system through the GUI.
-
-We have used File Manager https://github.com/javadev/file-manager .
+Our project is a file manager that supports git features, created using Java Swing. 
+It enables easy use of git-related commands through a Swing GUI-based program. 
+The software is built upon the following open-source software: https://github.com/javadev/file-manager .
 
 
 -----------------------------------------------------------------------------------------
--Windows 미리 갖추어야 할 환경 (우리팀에서 사용한 버전을 그대로 사용할 것을 추천합니다.)
+The following runtime environments are required:
+
+-Windows 
 
 Java(TM) SE Runtime Environment (build 19.0.2+7-44)
-
 Gradle 8.1.1
-
-intellij idea community edition 2022.3.2
-
-Microsoft Windows 버전 21H2(OS 빌드 19044.2846) Windows 10 Home
-
+IntelliJ IDEA Community Edition 2022.3.2
+Microsoft Windows version 21H2 (OS build 19044.2846) Windows 10 Home
 JDK 1.8
 
+Right-click on the file-manager folder and select "Open Folder as IntelliJ IDEA Community Edition Project"
+Install necessary packages from build.gradle
+In the gradle menu, double-click on filemanager - tasks - shadow - shadowJar to build
+You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.
 
-file-manager 폴더를 우클릭하여 “Open Folder as IntelliJ IDEA Community Edition Project” 선택
-
-build.gradle에서 필요패키지 설치하기
-
-gradle 메뉴에서 filemanager - tasks - shadow - shadowJar 더블 클릭하여 build하기
-
-2023_oss_project1\file-manager\build\libs 디렉터리 안에 filemanager-1.1-all.jar이 생성되었을 것입니다. 이를 실행하시면 됩니다.
 
 
 -----------------------------------------------------------------------------------------
 
--Mac 미리 갖추어야 할 환경 (우리팀에서 사용한 버전을 그대로 사용할 것을 추천합니다.)
+-Mac 
 
--Mac
-
-java 19.0.1 2022-10-18, Java(TM) SE Runtime Environment (build 19.0.1+10-21)
-
+Java 19.0.1 2022-10-18, Java(TM) SE Runtime Environment (build 19.0.1+10-21)
 Gradle 8.1.1
-
-intellij idea community edition 2023.1.1
- 
+IntelliJ IDEA Community Edition 2023.1.1
 MacBook Air M2 macOS 13.0
-
 JDK 1.8
 
+In IntelliJ, click the 'Open' button to register the project folder and run it
+Install necessary packages from build.gradle
+In the IntelliJ top menu -> Run -> Click 'Run FileManager.java'
+Alternatively, in the gradle menu, double-click on filemanager - shadow - shadowJar to build
+You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.
 
-IntelliJ에서 ‘열기'버튼을 눌러 프로젝트 폴더를 등록한 후 실행
-
-build.gradle에서 필요패키지 설치하기
-
-IntelliJ 상단 메뉴 -> 실행 -> ‘FileManager.java 실행’을 눌러 실행
-
-또는 gradle 메뉴에서 filemanager - shadow - shadowJar 더블 클릭하여 build하기
-
-2023_oss_project1\file-manager\build\libs 디렉터리 안에 filemanager-1.1-all.jar이 생성되었을 것입니다. 이를 실행하시면 됩니다.
-
+-----------------------------------------------------------------------------------------
+License 
+This project is licensed under the MIT license.
