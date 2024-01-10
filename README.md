@@ -20,10 +20,10 @@ Microsoft Windows version 21H2 (OS build 19044.2846) Windows 10 Home
 
 JDK 1.8
 
-Right-click on the file-manager folder and select "Open Folder as IntelliJ IDEA Community Edition Project"
-Install necessary packages from build.gradle
-In the gradle menu, double-click on filemanager - tasks - shadow - shadowJar to build
-You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.
+Right-click on the file-manager folder and select "Open Folder as IntelliJ IDEA Community Edition Project".  
+Install necessary packages from build.gradle.  
+In the gradle menu, double-click on filemanager - tasks - shadow - shadowJar to build.  
+You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.  
 
 
 
@@ -42,11 +42,11 @@ MacBook Air M2 macOS 13.0
 JDK 1.8
 
 
-In IntelliJ, click the 'Open' button to register the project folder and run it
-Install necessary packages from build.gradle
-In the IntelliJ top menu -> Run -> Click 'Run FileManager.java'
-Alternatively, in the gradle menu, double-click on filemanager - shadow - shadowJar to build
-You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.
+In IntelliJ, click the 'Open' button to register the project folder and run it.  
+Install necessary packages from build.gradle.  
+In the IntelliJ top menu -> Run -> Click 'Run FileManager.java'.  
+Alternatively, in the gradle menu, double-click on filemanager - shadow - shadowJar to build.  
+You should see the filemanager-1.1-all.jar in the 2023_oss_project1\file-manager\build\libs directory. You can run this.  
 
 -----------------------------------------------------------------------------------------
 License 
